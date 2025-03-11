@@ -1,0 +1,23 @@
+{
+  "name": "invest-platform",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gust1887/invest-platform.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gust1887/invest-platform/issues"
+  },
+  "homepage": "https://github.com/gust1887/invest-platform#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
