@@ -1,23 +1,22 @@
 {
   "name": "invest-platform",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "En investeringsplatform bygget",
+  "main": "server/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/gust1887/invest-platform.git"
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/gust1887/invest-platform/issues"
-  },
-  "homepage": "https://github.com/gust1887/invest-platform#readme",
-  "dependencies": {
-    "express": "^4.21.2"
-  }
+  "license": "MIT"
 }
