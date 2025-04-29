@@ -13,8 +13,10 @@ app.get('/', (req, res) => {
 });
 
 
-
-
+// Login rute
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '../HTML', 'login.html')); 
+});
 // Start serveren
 app.listen(port, () => {
   console.log(`Server kører på http://localhost:${port}`);
