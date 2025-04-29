@@ -8,15 +8,25 @@ app.use(express.static(path.join(__dirname, '..', 'HTML')));  // HTML mappen lig
 
 // Hjemmeside rute (index.html)
 app.get('/', (req, res) => {
-
-    res.sendFile(path.join(__dirname, '..', 'HTML', 'frontpage.html'));  // Path til frontpage.html
+    res.sendFile(path.join(__dirname, '..', 'HTML', 'frontpage.html'));
 });
-
 
 // Login rute
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, '../HTML', 'login.html')); 
 });
+
+// Opret bruger
+app.get('/opretbruger', (req, res) => {
+  res.sendFile(path.join(__dirname, '../HTML', 'opretbruger.html'));
+});
+
+
+
+
+
+
+
 // Start serveren
 app.listen(port, () => {
   console.log(`Server kører på http://localhost:${port}`);
