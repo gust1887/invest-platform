@@ -1,92 +1,40 @@
 <!DOCTYPE html>
 <html lang="da">
 <head>
+    <!-- Grunddesign (farver, baggrund osv.) -->
+    <link rel="stylesheet" href="CSS/bittheme.css">
+
+    <!-- Fælles layout og stil til login/opret bruger -->
+    <link rel="stylesheet" href="CSS/form.css">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-
-    <!-- Indlejret CSS styling -->
-    <style>
-        /* Grundlæggende styling */
-        body {
-            background-color: black; /* Sort baggrund */
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: white;
-        }
-
-        /* Centering the login box */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Styling for the login box */
-        .login-box {
-            background-color: #333; /* Mørk grå boks */
-            padding: 40px;
-            border-radius: 10px;
-            width: 300px;
-            text-align: center;
-        }
-
-        /* Styling for headings */
-        .login-box h2 {
-            color: white;
-            margin-bottom: 20px;
-        }
-
-        /* Input fields */
-        .textbox {
-            margin-bottom: 20px;
-        }
-
-        .textbox input {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: none;
-            border-radius: 5px;
-            background-color: #444; /* Mørk input baggrund */
-            color: white;
-            font-size: 16px;
-        }
-
-        /* Button styling */
-        .btn-login {
-            width: 100%;
-            padding: 10px;
-            background-color: green; /* Grøn knap */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 18px;
-        }
-    </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-box">
+    <!-- Alt indhold centreret i container -->
+    <div class="form-container">
+
+        <!-- Logo med klasse så vi kan style i CSS -->
+        <img src="images/BIT.png" class="form-logo" alt="Logo">
+
+        <!-- Boksen med login-formular -->
+        <div class="form-box">
             <h2>Login</h2>
             <form action="#" method="POST">
+
+                <!-- Brugernavn -->
                 <div class="textbox">
                     <input type="text" placeholder="Brugernavn" name="username" required>
                 </div>
+
+                <!-- Adgangskode -->
                 <div class="textbox">
                     <input type="password" placeholder="Adgangskode" name="password" required>
                 </div>
 
-                <p >Opret bruger</p>
-
-                <input type="submit" value="Login" class="btn-login">
+                <!-- Send knap -->
+                <input type="submit" value="Log ind" class="btn-login">
             </form>
         </div>
     </div>

@@ -1,0 +1,19 @@
+
+/* Background color */
+body {
+  background-color: black;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding-top: 50px;
+}
+
+/* To make sure our background fills the page */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
+

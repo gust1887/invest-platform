@@ -1,3 +1,53 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <!-- Henter grundlæggende design (baggrund, tekstfarve osv.) -->
+    <link rel="stylesheet" href="CSS/bittheme.css">
+
+     <!-- Fælles layout og stil til login/opret bruger -->
+    <link rel="stylesheet" href="CSS/form.css">
+
+  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opret Bruger</title>
+   
+</head>
+<body>
+    <!-- Container til hele formular-indholdet -->
+    <div class="form-container">
+
+        <!-- Logo øverst -->
+        <img src="images/BIT.png" class="form-logo" alt="Logo">
+
+        <!-- Selve formular-boksen -->
+        <div class="form-box">
+            <h2>Opret Bruger</h2>
+            <h5> Udfyld venligst alle oplysningerne</h5>
+            <form action="#" method="POST">
+                <!-- Brugernavn -->
+                <div class="textbox">
+                    <input type="text" placeholder="Brugernavn" name="username" required>
+                </div>
+
+
+                  <!-- e-mail -->
+                  <div class="textbox">
+                    <input type="email" placeholder="E-mail" name="email" required>
+                </div>
+
+                <!-- Adgangskode -->
+                <div class="textbox">
+                    <input type="password" placeholder="Adgangskode" name="password" required>
+                </div>
+
+                <!-- Send knap -->
+                <input type="submit" value="Opret Bruger" class="btn-login">
+            </form>
+        </div>
+    </div>
+</body>
+</html>
 
 
 
