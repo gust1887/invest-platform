@@ -1,6 +1,5 @@
 {
   "name": "invest-platform",
-  "type": "module",
   "version": "1.0.0",
   "description": "En investeringsplatform bygget",
   "main": "server/index.js",
