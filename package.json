@@ -12,6 +12,7 @@
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "mssql": "^11.0.1",
+    "node-fetch": "^3.3.2",
     "swagger-ui-express": "^5.0.1",
     "yamljs": "^0.3.0"
   },
@@ -23,5 +24,13 @@
   },
   "keywords": [],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gust1887/invest-platform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gust1887/invest-platform/issues"
+  },
+  "homepage": "https://github.com/gust1887/invest-platform#readme"
 }

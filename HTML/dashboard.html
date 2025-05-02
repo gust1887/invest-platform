@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+     <!-- Henter CSS fra vores CSS mappe -->
+    <link rel="stylesheet" href="CSS/bittheme.css">
+
+    <link rel="stylesheet" href="CSS/frontpage.css">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invest Platform</title>
+</head>
+<body>
+    <!-- Logo -->
+    <img src="images/BIT.png" alt="BIT logo" width="300" style="margin-bottom: 30px;">
+
+
+    <!-- API med søge den valgte aktie-->
+    <input id="symbol" placeholder="Tickersymbol">
+    <button onclick="hent()">Søg</button>
+
+    <canvas id="chart" width="70%" height="50"></canvas>
+    <!-- API med nøgletal for grafen-->
+    <div id="key-metrics" style="margin-top: 30px;">
+        <h3>Nøgletal</h3>
+        <ul id="metrics-list">
+        </ul>
+      </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+
+let graf;
+
+function hent() {
+  const symbol = document.getElementById('symbol').value;
+
+  fetch(`/api/${symbol}`)
+    .then(res => res.json())
+    .then(data => {
+      const datoer = data.map(d => d.dato);
+      const priser = data.map(d => d.pris);
+
+      const ctx = document.getElementById('chart').getContext('2d');
+      if (graf) graf.destroy();
+
+      graf = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: datoer,
+          datasets: [{
+            label: symbol,
+            data: priser,
+            borderColor: 'green'
+          }]
+        }
+      });
+//Dette er API til nøgletal efter grafen
+      return fetch(`/api/nogletal/${symbol}`);
+    })
+    .then(res => res.json())
+    .then(nogletal => {
+      console.log("Nøgletal modtaget:", nogletal);
+
+      const list = document.getElementById('metrics-list');
+      list.innerHTML = `
+        <li><strong>P/E:</strong> ${nogletal.pe}</li>
+        <li><strong>Volume:</strong> ${nogletal.volume}</li>
+        <li><strong>Market Cap:</strong> ${nogletal.marketCap}</li>
+        <li><strong>EPS:</strong> ${nogletal.eps}</li>
+        <li><strong>Udbytte i procent (%):</strong> ${nogletal.dividendYield}</li> `;
+    })
+    .catch(err => {
+      console.error("Fejl:", err);
+      document.getElementById('metrics-list').innerHTML = '<li>Kunne ikke hente nøgletal</li>';
+    });
+}
+</script>
+
+</body>
+</html>
