@@ -13,6 +13,8 @@
     <title>Opret Bruger</title>
    
 </head>
+
+
 <body>
     <!-- Container til hele formular-indholdet -->
     <div class="form-container">
@@ -24,21 +26,21 @@
         <div class="form-box">
             <h2>Opret Bruger</h2>
             <h5> Udfyld venligst alle oplysningerne</h5>
-            <form action="#" method="POST">
+            <form id="signupForm">
                 <!-- Brugernavn -->
                 <div class="textbox">
-                    <input type="text" placeholder="Brugernavn" name="username" required>
+                    <input type="text" id="signupUsername" placeholder="Brugernavn" name="username" required>
                 </div>
 
 
                   <!-- e-mail -->
                   <div class="textbox">
-                    <input type="email" placeholder="E-mail" name="email" required>
+                    <input type="email" id="signupEmail" placeholder="E-mail" name="email" required>
                 </div>
 
                 <!-- Adgangskode -->
                 <div class="textbox">
-                    <input type="password" placeholder="Adgangskode" name="password" required>
+                    <input type="password" id="signupPassword" placeholder="Adgangskode" name="password" required>
                 </div>
 
                 <!-- Send knap -->
@@ -46,6 +48,9 @@
             </form>
         </div>
     </div>
+    <div id="signupMessage"></div>
+<script src="opretbruger.js"></script>
+
 </body>
 </html>
 

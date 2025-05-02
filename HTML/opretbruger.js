@@ -5,7 +5,7 @@ const users = [
   ];
   
   // Lyt efter submit på opret-bruger formular
-  document.getElementById('signupForm').addEventListener('submit', function (e) {
+  document.getElementById('signupForm').addEventListener('submit', async function (e) {
     e.preventDefault(); // Forhindrer side reload
   
     // Hent inputværdier
@@ -39,13 +39,32 @@ const users = [
     }
   
     // Tilføj bruger
-    users.push({
-      username: newUsername,
-      password: newPassword,
-      email: newEmail
-    });
+    try {
+      console.log("Sender til server:", newUsername, newPassword, newEmail);
+      const response = await fetch('/api/users/opretbruger', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: newUsername,
+          password: newPassword,
+          email: newEmail
+        })
+        
+      });
   
-    document.getElementById('signupMessage').innerText = 'Bruger oprettet!';
+      const data = await response.json();
+  
+      if (response.ok) {
+        document.getElementById('signupMessage').innerText = 'Bruger oprettet!';
+      } else {
+        document.getElementById('signupMessage').innerText = data.error || 'Fejl ved oprettelse.';
+      }
+    } catch (err) {
+      console.error(err);
+      document.getElementById('signupMessage').innerText = 'Netværksfejl.';
+    }
     // Du kan evt. omdirigere: window.location.href = 'login.html';
   });
   

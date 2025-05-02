@@ -10,9 +10,9 @@ async function getConnection() {
   if (!pool) { // Hvis vi ikke allerede har en åben forbindelse
     try {
       pool = await sql.connect(passwordConfig); // Opret forbindelsen med dine config-oplysninger
-      console.log("Connected to database")
+      console.log("Forbundet til SQL database")
     } catch (err) {
-      console.error("Couldn't connect to database", err);
+      console.error("Kunne ikke forbinde til database", err);
       throw err; // Giv fejlen videre, hvis forbindelsen mislykkes
     }
   }
