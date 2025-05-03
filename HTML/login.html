@@ -21,22 +21,24 @@
         <!-- Boksen med login-formular -->
         <div class="form-box">
             <h2>Login</h2>
-            <form action="#" method="POST">
+            <form id="loginForm">
 
                 <!-- Brugernavn -->
                 <div class="textbox">
-                    <input type="text" placeholder="Brugernavn" name="username" required>
+                    <input type="text" id="username" placeholder="Brugernavn" name="username" required>
                 </div>
 
                 <!-- Adgangskode -->
                 <div class="textbox">
-                    <input type="password" placeholder="Adgangskode" name="password" required>
+                    <input type="password" id="password" placeholder="Adgangskode" name="password" required>
                 </div>
 
                 <!-- Send knap -->
                 <input type="submit" value="Log ind" class="btn-login">
             </form>
+            <div id="message"></div> <!-- Vis loginbesked her -->
         </div>
     </div>
+    <script src="login.js"></script>
 </body>
 </html>

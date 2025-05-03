@@ -1,44 +1,56 @@
-// Dummy-brugere (kan senere erstattes af databaseopslag)
-const users = [ // En liste (array) med fiktive brugere og deres adgangskoder
-    {
-      username: 'testbruger', // Brugernavn
-      password: 'tester1234'  // Tilhørende adgangskode
-    },
-    {
-      username: 'admin',
-      password: 'admin123'
-    }
-  ];
-  
+
   // Loginfunktion
-  document.getElementById('loginForm').addEventListener('submit', function (e) {
+  document.getElementById('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault(); // Forhindrer at siden genindlæses ved formularens standard-handling
   
-    const inputUsername = document.getElementById('username').value;
-    const inputPassword = document.getElementById('password').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
   
     // Valider adgangskodens længde og om den indeholder mindst ét tal
-    const passwordIsValid = inputPassword.length >= 8 &&
-                            inputPassword.length <= 20 &&
-                            /\d/.test(inputPassword); // Tjekker om der er mindst ét tal
+    const passwordIsValid = password.length >= 8 &&
+                            password.length <= 20 &&
+                            /\d/.test(password); // Tjekker om der er mindst ét tal
   
     if (!passwordIsValid) {
       document.getElementById('message').innerText = 'Adgangskoden skal være mellem 8 og 20 tegn og indeholde mindst ét tal.';
       return; // Stop funktionen her, hvis adgangskoden ikke er gyldig
     }
+
+    try {
+      // Send login-data til backend via POST-request
+      const response = await fetch('/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, // Vi sender JSON
+        body: JSON.stringify({ username, password }) // Brugernavn og kode sendes i kroppen
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Hvis login er godkendt, gem brugernavn i session storage
+        sessionStorage.setItem('loggedInUser', username);
   
-    // Søger i users-arrayet efter en bruger med matchende brugernavn og adgangskode
-    const user = users.find(u => u.username === inputUsername && u.password === inputPassword);
-  
-    if (user) {
-      sessionStorage.setItem('loggedInUser', inputUsername);
-      document.getElementById('message').innerText = 'Du er nu logget ind.';
-      // window.location.href = "dashboard.html";
+        // Vis besked til brugeren
+        document.getElementById('message').innerText = data.message;
+
+       // Send brugeren videre til dashboard
+       window.location.href = '/dashboard';
     } else {
-      document.getElementById('message').innerText = 'Forkert brugernavn eller adgangskode.';
+      // Hvis login fejler (forkert kode fx), vis fejlbesked fra serveren
+      document.getElementById('message').innerText = data.error;
     }
-  });
-  
+  } catch (err) {
+    // Hvis noget går galt med forbindelsen til serveren
+    console.error('Fejl i fetch:', err);
+    document.getElementById('message').innerText = 'Der opstod en fejl ved login.';
+  }
+});
+
+
+
+ /*
+
+
     // Skift adgangskode-funktion
   // Lyt efter submit på skift adgangskode-formular
   document.getElementById('changePasswordForm').addEventListener('submit', function (e) {
