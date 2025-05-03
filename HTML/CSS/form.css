@@ -46,11 +46,30 @@
 .btn-submit {
   width: 100%;
   padding: 10px;
-  background-color: green;
-  color: white;
+  background-color: rgb(255, 255, 255);
+  color: rgb(11, 11, 11);
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 18px;
 }
+
+/* Styling til glemt adgangskode knappen */
+.forgot-password {
+  margin-top: 10px;
+}
+
+.forgot-password a {
+  color: #ccc;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.forgot-password a:hover {
+  color: white;
+}
+
+
+
+
 
