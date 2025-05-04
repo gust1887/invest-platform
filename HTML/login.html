@@ -1,47 +1,55 @@
 <!DOCTYPE html>
 <html lang="da">
 <head>
-    <!-- Grunddesign (farver, baggrund osv.) -->
-    <link rel="stylesheet" href="CSS/bittheme.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
 
-    <!-- Fælles layout og stil til login/opret bruger -->
-    <link rel="stylesheet" href="CSS/form.css">
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+  <!-- Design og layout -->
+  <link rel="stylesheet" href="CSS/bittheme.css">
+  <link rel="stylesheet" href="CSS/form.css">
 </head>
 <body>
-    <!-- Alt indhold centreret i container -->
-    <div class="form-container">
+  <!-- Alt indhold centreres -->
+  <div class="form-container">
+    <!-- Logo -->
+    <img src="images/BIT.png" class="form-logo" alt="Logo">
 
-        <!-- Logo med klasse så vi kan style i CSS -->
-        <img src="images/BIT.png" class="form-logo" alt="Logo">
-
-        <!-- Boksen med login-formular -->
-        <div class="form-box">
-            <h2>Login</h2>
-            <form id="loginForm">
-
-                <!-- Brugernavn -->
-                <div class="textbox">
-                    <input type="text" id="username" placeholder="Brugernavn" name="username" required>
-                </div>
-
-                <!-- Adgangskode -->
-                <div class="textbox">
-                    <input type="password" id="password" placeholder="Adgangskode" name="password" required>
-                </div>
-                <!-- Glemt adgangskode link -->
-                <p class="forgot-password">
-                    <a href="forgotpassword.html">Glemt adgangskode?</a>
-                </p>
-                <!-- Send knap -->
-                <input type="submit" value="Log ind" class="btn-login">
-            </form>
-            <div id="message"></div> <!-- Vis loginbesked her -->
+    <!-- LOGIN-FORMULAR -->
+    <div class="form-box">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <div class="textbox">
+          <input type="text" id="username" name="username" placeholder="Brugernavn" required>
         </div>
+        <div class="textbox">
+          <input type="password" id="password" name="password" placeholder="Adgangskode" required>
+        </div>
+        <p class="forgot-password">
+          <a href="forgotpassword.html">Glemt adgangskode?</a>
+        </p>
+        <input type="submit" value="Log ind" class="btn-login">
+      </form>
+      <div id="message"></div>
     </div>
-    <script src="login.js"></script>
+
+    <!-- SKIFT ADGANGSKODE -->
+    <div class="form-box">
+      <h2>Skift adgangskode</h2>
+      <form id="changePasswordForm">
+        <div class="textbox">
+          <input type="password" id="oldPassword" placeholder="Nuværende adgangskode" required>
+        </div>
+        <div class="textbox">
+          <input type="password" id="newPassword" placeholder="Ny adgangskode" required>
+        </div>
+        <input type="submit" value="Skift adgangskode" class="btn-login">
+      </form>
+      <div id="changeMessage"></div>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script src="login.js"></script>
 </body>
 </html>
