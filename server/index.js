@@ -8,10 +8,15 @@ const accountRoutes = require('./routes/accountRoutes');
 //API KEY 
 API_KEY = '67T6LZMPL60CMGW4'; 
 
+// Connection til SQL db 
+const { getConnection } = require('./database');
 
 
 const app = express();
 const port = 5000;
+
+app.use(express.json()); // Gør det muligt at læse JSON i req.body
+
 
 //Henter aktiedata fra en API
 
@@ -68,7 +73,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/accounts', accountRoutes);
 
 
-app.use(express.json()); // Gør det muligt at læse JSON i req.body
 
 app.use(express.static(path.join(__dirname, '..', 'HTML')));  // HTML mappen ligger uden for server mappen
 
@@ -95,9 +99,16 @@ app.get('/dashboard', (req, res) => {
 
 
 
-
-
 // Start serveren
 app.listen(port, () => {
   console.log(`Server kører på http://localhost:${port}`);
 });
+
+// Sikrer forbindelse til SQL db
+(async () => {
+  try {
+    await getConnection();
+  } catch (err) {
+    console.error("Forbindelse til databasen fejlede:", err);
+  }
+})();
