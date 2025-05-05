@@ -1,0 +1,74 @@
+/* userface.css – fælles layout til loggede sider */
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: white;
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #1a1a1a;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Sidebar logo */
+.sidebar img {
+  width: 160px;
+  margin-bottom: 30px;
+}
+
+/* Navigation */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.sidebar li {
+  width: 100%;
+  margin: 10px 0;
+}
+
+/* Links */
+.sidebar a {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 5px;
+  text-align: center;
+  transition: background-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* Hover-effekt */
+.sidebar a:hover {
+  background-color: #333;
+}
+
+/* Aktiv side */
+.sidebar a.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* Main content område */
+.main-content {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+

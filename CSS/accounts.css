@@ -1,52 +1,9 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: black;
-  color: white;
-  display: flex;
-}
-
-.sidebar {
-  width: 200px;
-  background-color: #1a1a1a;
-  padding: 20px;
-  height: 100vh;
-}
-
-.logo {
-  width: 100%;
-  margin-bottom: 30px;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar li {
-  margin: 20px 0;
-}
-
-.sidebar a {
-  color: white;
-  text-decoration: none;
-}
-
-.sidebar a.active {
-  font-weight: bold;
-  color: #4CAF50;
-}
-
-.main-content {
-  flex: 1;
-  padding: 30px;
-}
 
 .account-box {
   background-color: #2c2c2c;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 10px;
+  padding: 50px;
+  margin-bottom: 50px;
+  border-radius: 50px;
   display: flex;
   align-items: center;
   justify-content: space-between;
