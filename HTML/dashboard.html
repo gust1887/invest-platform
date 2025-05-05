@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
     <!-- CSS: Grundtema og Dashboard layout -->
     <link rel="stylesheet" href="CSS/bittheme.css">
@@ -25,29 +25,17 @@
         <div class="main-content">
             <!-- Søgefelt -->
             <input id="symbol" placeholder="Tickersymbol">
-            <button onclick="hent()">Søg</button>
-
+            <button onclick="hent()">Search</button>
             <!-- Graf -->
             <canvas id="chart" width="70%" height="50"></canvas>
 
-<<<<<<< HEAD
-    <canvas id="chart" width="70%" height="50"></canvas>
-    
-    <!-- API med nøgletal for grafen-->
-    <div id="key-metrics" style="margin-top: 30px;">
-        <h3>Nøgletal</h3>
-        <ul id="metrics-list">
-        </ul>
-      </div>
-=======
             <!-- Nøgletal -->
             <div id="key-metrics" style="margin-top: 30px;">
-                <h3>Nøgletal</h3>
+                <h3>Key figures</h3>
                 <ul id="metrics-list"></ul>
             </div>
         </div>
     </div>
->>>>>>> cd48c406453297453ed4cb8aff1b40f17c619772
 
     <!-- Chart.js bibliotek + din eksisterende JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -93,7 +81,6 @@
                         <li><strong>Udbytte i procent (%):</strong> ${nogletal.dividendYield}</li>`;
                 })
                 .catch(err => {
-                    console.error("Fejl:", err);
                     document.getElementById('metrics-list').innerHTML = '<li>Kunne ikke hente nøgletal</li>';
                 });
         }
