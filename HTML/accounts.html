@@ -1,51 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- CSS: Grundtema og Dashboard layout -->
+    <!-- CSS: Grundtema og layout -->
     <link rel="stylesheet" href="../CSS/bittheme.css">
     <link rel="stylesheet" href="../CSS/dashboard.css">
     <link rel="stylesheet" href="../CSS/userface.css">
+    <link rel="stylesheet" href="../CSS/accounts.css">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invest Platform - Accounts</title>
 </head>
 <body>
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <img src="images/BIT.png" alt="BIT logo" class="sidebar-logo">
-            <ul class="nav-links">
-              <li><a href="dashboard.html">Dashboard</a></li>
-              <li><a href="accounts.html" class="active">Accounts</a></li>
-                <li><a href="portfolios.html">Portfolios</a></li>
-            </ul>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <img src="images/BIT.png" alt="BIT logo" class="sidebar-logo">
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="accounts.html" class="active">Accounts</a></li>
+            <li><a href="portfolios.html">Portfolios</a></li>
+        </ul>
+        <div class="sidebar-bottom">
+          <button onclick="location.href='changepassword.html'">Change Password</button>
+          <button onclick="location.href='logout.html'">Log Out</button>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <!-- Konto-boks -->
+        <div class="account-box">
+            <div class="account-left">
+                <div class="icon">👤</div>
+                <div class="info">
+                    <p><strong>Account:</strong> Mikkel</p>
+                    <p><strong>Currency:</strong> DKK</p>
+                    <p><strong>Balance:</strong> 10.000,00</p>
+                </div>
+            </div>
+            <!-- Knapper i konto boks -->
+            <div class="account-actions">
+                <button class="transfer-btn">Transfer Money</button>
+                <button class="close-btn">Close Account</button>
+            </div>
         </div>
 
-  <div class="main-content">
-    <!-- Brugerboks 1 -->
-    <div class="account-box" onclick="window.location.href='dashboard.html'">
-      <div class="icon">👤</div>
-      <div class="info">
-        <p><strong>Konto:</strong> Mikkel</p>
-        <p><strong>Currency:</strong> DKK</p>
-        <p><strong>Balance:</strong> 10.000</p>
-      </div>
-      <button class="close-btn">Luk</button>
+        <!-- Tilføj konto-knap -->
+        <button class="add-account-btn">+ Tilføj konto</button>
     </div>
-
-    <!-- Brugerboks 2 -->
-    <div class="account-box" onclick="window.location.href='dashboard.html'">
-      <div class="icon">👤</div>
-      <div class="info">
-        <p><strong>Konto:</strong> Test123</p>
-        <p><strong>Currency:</strong> USD</p>
-        <p><strong>Balance:</strong> 4.200</p>
-      </div>
-      <button class="close-btn">Luk</button>
-    </div>
-
-    <!-- ADD knap -->
-    <button class="add-btn">+ ADD</button>
-  </div>
 </body>
 </html>
+

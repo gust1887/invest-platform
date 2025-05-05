@@ -72,3 +72,33 @@ body {
 }
 
 
+
+/* Buttons in the bottom - Change password and log out */
+.sidebar-bottom {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* mellemrum mellem knapper */
+}
+
+.sidebar-bottom button {
+  width:13%;
+  padding: 10px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s ease;
+  
+}
+
+.sidebar-bottom button:hover {
+  background-color: #555;
+}
+

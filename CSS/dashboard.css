@@ -1,1 +1,33 @@
-/*tester*/
+.dashboard-cards {
+  display: flex;
+  gap: 20px;
+  padding: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.dashboard-card {
+  background-color: #1e1e1e;
+  padding: 20px 30px;
+  border-radius: 15px;
+  color: white;
+  width: 250px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  text-align: left;
+  transition: transform 0.2s ease;
+}
+
+.dashboard-card:hover {
+  transform: scale(1.02);
+}
+
+.card-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin: 8px 0;
+}
+
+.card-sub {
+  font-size: 0.9rem;
+  color: #aaa;
+}
