@@ -78,6 +78,5 @@ router.post('/login', async (req, res) => {
 });
 
 
-
 // Eksporterer routeren så den kan bruges i index.js
 module.exports = router;
