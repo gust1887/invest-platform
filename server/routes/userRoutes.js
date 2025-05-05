@@ -61,7 +61,11 @@ router.post('/login', async (req, res) => {
     // Hvis der blev fundet mindst én bruger, er login godkendt
     if (result.recordset.length > 0) {
       // Send en succes-besked til klienten
-      res.status(200).json({ message: 'Du er nu logget ind.' });
+      res.status(200).json({
+        message: 'Du er nu logget ind.',
+        userId: result.recordset[0].id  // ← kolonnenavnet i din Users-tabel
+      });
+      
     } else {
       // Hvis ingen bruger matcher, send 401 Unauthorized med fejlbesked
       res.status(401).json({ error: 'Forkert brugernavn eller adgangskode.' });

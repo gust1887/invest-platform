@@ -7,8 +7,8 @@ document.getElementById('loginForm').addEventListener('submit', async function (
   const password = document.getElementById('password').value;
 
   const passwordIsValid = password.length >= 8 &&
-                          password.length <= 20 &&
-                          /\d/.test(password); // Tjek mindst ét tal
+    password.length <= 20 &&
+    /\d/.test(password); // Tjek mindst ét tal
 
   if (!passwordIsValid) {
     document.getElementById('message').innerText =
@@ -27,6 +27,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 
     if (response.ok) {
       sessionStorage.setItem('loggedInUser', username);
+      sessionStorage.setItem('userId', data.userId); 
       document.getElementById('message').innerText = data.message || 'Login succesfuldt.';
       window.location.href = '/dashboard'; // Send brugeren videre
     } else {
