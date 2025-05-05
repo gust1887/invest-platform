@@ -73,7 +73,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/accounts', accountRoutes);
 
 
-
+app.use('/JS', express.static(path.join(__dirname, '..', 'JS'))); // JS mappen ligger uden for server mappen
 app.use(express.static(path.join(__dirname, '..', 'HTML')));  // HTML mappen ligger uden for server mappen
 
 // Hjemmeside rute (index.html)

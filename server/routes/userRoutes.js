@@ -15,7 +15,6 @@ router.post('/opretbruger', async (req, res) => {
   // Vi henter de tre felter fra body'en i requesten
   const { username, password, email } = req.body;
   
-
   try {
     // Vi opretter forbindelse til databasen (hentes en gang og genbruges)
     const pool = await getConnection();

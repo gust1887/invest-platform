@@ -1,63 +1,70 @@
-// Dummy users-array til frontend-validering (kun til test)
+// Fortsæt fra tidligere users-array
 const users = [
   { username: 'testbruger', password: 'tester1234', email: 'test@example.com' },
   { username: 'admin', password: 'admin123', email: 'admin@example.com' }
 ];
 
-// Lyt efter submit
+// Lyt efter submit på opret-bruger formular
 document.getElementById('signupForm').addEventListener('submit', async function (e) {
-  e.preventDefault();
+  e.preventDefault(); // Forhindrer side reload
 
-  const username = document.getElementById('signupUsername').value.trim();
-  const email = document.getElementById('signupEmail').value.trim();
-  const password = document.getElementById('signupPassword').value;
+  // Hent inputværdier
+  const newUsername = document.getElementById('signupUsername').value;
+  const newPassword = document.getElementById('signupPassword').value;
+  const newEmail = document.getElementById('signupEmail').value;
 
-  const messageElement = document.getElementById('signupMessage');
-
-  // Valider adgangskode
-  const passwordIsValid = password.length >= 8 &&
-                          password.length <= 20 &&
-                          /\d/.test(password); // mindst ét tal
+  // Tjek adgangskodekrav
+  const passwordIsValid = newPassword.length >= 8 &&
+                          newPassword.length <= 20 &&
+                          /\d/.test(newPassword); // Min. ét tal
 
   if (!passwordIsValid) {
-    messageElement.textContent = 'Adgangskoden skal være mellem 8-20 tegn og indeholde mindst ét tal.';
+    document.getElementById('signupMessage').innerText =
+      'Adgangskoden skal være mellem 8-20 tegn og indeholde mindst ét tal.';
     return;
   }
 
-  // Valider e-mail
-  const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // Tjek om e-mail er gyldig
+  const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail);
   if (!emailIsValid) {
-    messageElement.textContent = 'Ugyldig e-mailadresse.';
+    document.getElementById('signupMessage').innerText = 'Ugyldig e-mailadresse.';
     return;
   }
 
-  // Tjek om brugernavn allerede findes (lokalt)
-  const existingUser = users.find(u => u.username === username);
+  // Tjek om brugernavnet allerede findes
+  const existingUser = users.find(u => u.username === newUsername);
   if (existingUser) {
-    messageElement.textContent = 'Brugernavn er allerede i brug.';
+    document.getElementById('signupMessage').innerText = 'Brugernavn er allerede i brug.';
     return;
   }
 
-  // Send til backend
+  // Tilføj bruger
   try {
+    console.log("Sender til server:", newUsername, newPassword, newEmail);
     const response = await fetch('/api/users/opretbruger', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, email })
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: newUsername,
+        password: newPassword,
+        email: newEmail
+      })
+      
     });
 
-    const result = await response.json();
+    const data = await response.json();
 
     if (response.ok) {
-      messageElement.style.color = 'green';
-      messageElement.textContent = 'Bruger oprettet!';
-      // Kan evt. omdirigere efter 2 sekunder:
-      // setTimeout(() => window.location.href = 'login.html', 2000);
+      document.getElementById('signupMessage').innerText = 'Bruger oprettet!';
     } else {
-      messageElement.textContent = result.error || 'Fejl ved oprettelse.';
+      document.getElementById('signupMessage').innerText = data.error || 'Fejl ved oprettelse.';
     }
   } catch (err) {
     console.error(err);
-    messageElement.textContent = 'Netværksfejl. Prøv igen senere.';
+    document.getElementById('signupMessage').innerText = 'Netværksfejl.';
   }
+  // Du kan evt. omdirigere: window.location.href = 'login.html';
 });
+
