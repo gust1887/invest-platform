@@ -58,6 +58,7 @@ document.getElementById('signupForm').addEventListener('submit', async function 
 
     if (response.ok) {
       document.getElementById('signupMessage').innerText = 'Bruger oprettet!';
+      window.location.href = '/dashboard'; // Send brugeren videre
     } else {
       document.getElementById('signupMessage').innerText = data.error || 'Fejl ved oprettelse.';
     }

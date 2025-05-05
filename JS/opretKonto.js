@@ -1,6 +1,7 @@
 document.getElementById('signupForm').addEventListener('submit', async function (e) {
     e.preventDefault();
-  
+    console.log("userId i sessionStorage:", sessionStorage.getItem('userId'));
+
     const accountName = document.getElementById('accountName').value;
     const currency = document.getElementById('currency').value;
   
@@ -16,8 +17,8 @@ document.getElementById('signupForm').addEventListener('submit', async function 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: parseInt(userId),
-          accountName,
+          user_id: parseInt(userId),
+          name,
           balance: 0,
           currency
         })
@@ -25,14 +26,9 @@ document.getElementById('signupForm').addEventListener('submit', async function 
   
       const result = await response.json();
   
-      if (response.ok) {
-        // Vis besked (valgfrit)
-        document.getElementById('signupMessage').innerText = result.message;
-      
-        // Vent 1 sekund og send brugeren videre til accounts.html
         if (response.ok) {
             window.location.href = '/accounts';
-          }} else {
+          } else {
         document.getElementById('signupMessage').innerText = result.error || 'Fejl ved oprettelse.';
       }
     } catch (error) {
