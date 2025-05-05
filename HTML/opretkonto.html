@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <!-- Henter grundlæggende design (baggrund, tekstfarve osv.) -->
+    <link rel="stylesheet" href="CSS/bittheme.css">
+
+     <!-- Fælles layout og stil til login/opret bruger -->
+    <link rel="stylesheet" href="CSS/form.css">
+
+  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opret konto</title>
+   
+</head>
+
+
+<body>
+    <!-- Container til hele formular-indholdet -->
+    <div class="form-container">
+
+        <!-- Logo øverst -->
+        <img src="images/BIT.png" class="form-logo" alt="Logo">
+
+        <!-- Selve formular-boksen -->
+        <div class="form-box">
+            <h2>Opret konto</h2>
+            <h5> Udfyld venligst alle oplysningerne</h5>
+            <form id="signupForm">
+                <!-- Kontonavn -->
+                <div class="textbox">
+                    <input type="text" id="accountName" placeholder="Kontonavn" name="kontonavn" required>
+                </div>
+
+
+                  <!-- Valuta *ÆNDRER TIL DROPDOWN MED VALGMULIGHEDER* -->
+                  <div class="textbox">
+                    <select id="currency" name="valuta" required>
+                      <option value="">Vælg valuta</option>
+                      <option value="DKK">Danske kroner (DKK)</option>
+                      <option value="USD">Amerikanske dollars (USD)</option>
+                      <option value="EUR">Euro (EUR)</option>
+                      <option value="GBP">Britiske pund (GBP)</option>
+                    </select>
+                  </div>
+                  
+
+
+                <!-- Send knap -->
+                <input type="submit" value="Opret konto" class="btn-login">
+            </form>
+        </div>
+    </div>
+    <div id="signupMessage"></div>
+<script src="/JS/opretkonto.js"></script>
+
+</body>
+</html>
+
+
+

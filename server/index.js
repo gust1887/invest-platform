@@ -97,6 +97,15 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '../HTML', 'dashboard.html'));
 });
 
+// Opret konto
+app.get('/opretkonto', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'HTML', 'opretkonto.html'));
+});
+
+// Kontier
+app.get('/accounts', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'HTML', 'accounts.html'));
+});
 
 
 // Start serveren
