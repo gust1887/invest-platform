@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <title>Accounts</title>
+  <link rel="stylesheet" href="CSS/bittheme.css">
+  <link rel="stylesheet" href="CSS/accounts.css">
+</head>
+<body>
+  <div class="sidebar">
+    <img src="images/BIT.png" alt="Logo" class="logo">
+    <nav>
+      <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="accounts.html" class="active">Accounts</a></li>
+        <li><a href="portfolios.html">Portfolios</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <!-- Brugerboks 1 -->
+    <div class="account-box" onclick="window.location.href='dashboard.html'">
+      <div class="icon">👤</div>
+      <div class="info">
+        <p><strong>Konto:</strong> Mikkel</p>
+        <p><strong>Currency:</strong> DKK</p>
+        <p><strong>Balance:</strong> 10.000</p>
+      </div>
+      <button class="close-btn">Luk</button>
+    </div>
+
+    <!-- Brugerboks 2 -->
+    <div class="account-box" onclick="window.location.href='dashboard.html'">
+      <div class="icon">👤</div>
+      <div class="info">
+        <p><strong>Konto:</strong> Test123</p>
+        <p><strong>Currency:</strong> USD</p>
+        <p><strong>Balance:</strong> 4.200</p>
+      </div>
+      <button class="close-btn">Luk</button>
+    </div>
+
+    <!-- ADD knap -->
+    <button class="add-btn">+ ADD</button>
+  </div>
+</body>
+</html>
