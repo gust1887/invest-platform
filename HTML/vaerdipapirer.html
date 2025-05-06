@@ -7,23 +7,7 @@
   <link rel="stylesheet" href="../CSS/portfolios.css" />
   <link rel="stylesheet" href="../CSS/userface.css" />
   <link rel="stylesheet" href="../CSS/bittheme.css" />
-  <style>
-    /* Tilføjet hvis button-klasse ikke allerede findes */
-    .button {
-      padding: 0.6em 1.2em;
-      margin-left: 0.5em;
-      font-size: 1em;
-      background-color: #2196f3;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .button:hover {
-      background-color: #1976d2;
-    }
-  </style>
+  <link rel="stylesheet" href="../CSS/værdipapirer.css" />
 </head>
 <body>
   <!-- Sidebar -->
@@ -37,6 +21,7 @@
     </ul>
   </div>
 
+  <!-- Main content -->
   <div class="container">
     <h1 id="portfolioHeading">Securities Overview</h1>
 
@@ -61,8 +46,8 @@
     <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
       <h2>Securities in Portfolio</h2>
       <div>
-        <button class="button" onclick="handleBuy()">Buy</button>
-        <button class="button" onclick="handleSell()">Sell</button>
+        <button class="primary-button" onclick="handleBuy()">Buy</button>
+        <button class="primary-button" onclick="handleSell()">Sell</button>
       </div>
     </div>
 
@@ -123,43 +108,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    // Dummy data for chart
-    const chartLabels = ["Apple Inc.", "Microsoft Corp.", "iShares Core MSCI World ETF", "Tesla Inc.", "Nvidia Corp."];
-    const chartData = [3000, 3750, 450, 3500, 4800];
-    const chartColors = ["#4caf50", "#2196f3", "#ff9800", "#f44336", "#9c27b0"];
-
-    // Chart.js code
-    const ctx = document.getElementById("securitiesChart").getContext("2d");
-    new Chart(ctx, {
-      type: "doughnut",
-      data: {
-        labels: chartLabels,
-        datasets: [{
-          data: chartData,
-          backgroundColor: chartColors
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: 'bottom' }
-        }
-      }
-    });
-
-    // Static Total Value Calculation
-    const totalPortfolioValue = chartData.reduce((acc, curr) => acc + curr, 0);
-    document.getElementById("totalValueDisplay").textContent = `${totalPortfolioValue} DKK`;
-
-    // Button handlers
-    function handleBuy() {
-      alert("Funktion til at købe værdipapir kommer her.");
-    }
-
-    function handleSell() {
-      alert("Funktion til at sælge værdipapir kommer her.");
-    }
-  </script>
+  <script src="../JS/værdipapirer.js"></script>
 </body>
 </html>
+
