@@ -12,7 +12,7 @@ CREATE TABLE Users (
 CREATE TABLE Accounts (
     id INT PRIMARY KEY IDENTITY(1,1),
     user_id INT NOT NULL,
-    name NVARCHAR(100),
+    accountName NVARCHAR(100),
     currency NVARCHAR(10),
     balance DECIMAL(18,2) DEFAULT 0,
     created_at DATETIME DEFAULT GETDATE(),
