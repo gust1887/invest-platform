@@ -5,19 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Portfolio Overview</title>
   <link rel="stylesheet" href="../CSS/portfolios.css" />
-  <link rel="stylesheet" href="../CSS/userface.css" />
-  <link rel="stylesheet" href="../CSS/bittheme.css" />
 </head>
 <body>
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <img src="images/BIT.png" alt="BIT logo" class="sidebar-logo">
-            <ul class="nav-links">
-              <li><a href="dashboard.html">Dashboard</a></li>
-              <li><a href="accounts.html">Accounts</a></li>
-                <li><a href="portfolios.html" class="active">Portfolios</a></li>
-            </ul>
-        </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <img src="images/BIT.png" alt="BIT logo" class="sidebar-logo">
+    <ul class="nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="accounts.html">Accounts</a></li>
+      <li><a href="portfolios.html" class="active">Portfolios</a></li>
+    </ul>
   </div>
 
   <div class="container">
@@ -27,7 +25,7 @@
     <div class="top-stats">
       <div class="box">
         <h3>Total Value in DKK</h3>
-        <p id="totalValue" style="font-size: 24px;">224,543 DKK</p>
+        <p id="totalValue" class="big-number">224.543 DKK</p>
       </div>
       <div class="box">
         <h3>24 Hour Change</h3>
@@ -43,16 +41,20 @@
     </div>
 
     <!-- Button to create new portfolio -->
-    <button id="addPortfolioBtn">Create New Portfolio</button>
+    <button id="addPortfolioBtn" class="primary-button">+ Create New Portfolio</button>
 
-    <!-- Form to create new portfolio (hidden by default) -->
-    <div id="newPortfolioForm" style="display: none; margin-top: 2rem;">
+    <!-- Form to create new portfolio -->
+    <div id="newPortfolioForm" class="form-card" style="display: none;">
       <h3>Create a New Portfolio</h3>
-      <label for="portfolioName">Portfolio Name:</label>
-      <input type="text" id="portfolioName" required />
-      <label for="bankAccount">Bank:</label>
-      <input type="text" id="bankAccount" required />
-      <button id="submitNewPortfolio">Add Portfolio</button>
+      <div class="form-group">
+        <label for="portfolioName">Portfolio Name:</label>
+        <input type="text" id="portfolioName" required />
+      </div>
+      <div class="form-group">
+        <label for="bankAccount">Bank:</label>
+        <input type="text" id="bankAccount" required />
+      </div>
+      <button id="submitNewPortfolio" class="primary-button">Add Portfolio</button>
     </div>
 
     <!-- Portfolio Table -->
@@ -110,5 +112,3 @@
   <script src="../JS/portfolios.js"></script>
 </body>
 </html>
-
-
