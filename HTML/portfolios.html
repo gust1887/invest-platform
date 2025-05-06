@@ -20,8 +20,95 @@
         </div>
   </div>
 
+  <div class="container">
+    <h1>Portfolio Overview</h1>
+
+    <!-- Top boxes -->
+    <div class="top-stats">
+      <div class="box">
+        <h3>Total Value in DKK</h3>
+        <p id="totalValue" style="font-size: 24px;">224,543 DKK</p>
+      </div>
+      <div class="box">
+        <h3>24 Hour Change</h3>
+        <p class="green" id="change24h">+1.4%</p>
+        <h3>7 Day Change</h3>
+        <p class="red" id="change7d">-1.7%</p>
+        <h3>30 Day Change</h3>
+        <p class="green" id="change30d">+2.4%</p>
+      </div>
+      <div class="box chart-box">
+        <canvas id="portfolioChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Button to create new portfolio -->
+    <button id="addPortfolioBtn">Create New Portfolio</button>
+
+    <!-- Form to create new portfolio (hidden by default) -->
+    <div id="newPortfolioForm" style="display: none; margin-top: 2rem;">
+      <h3>Create a New Portfolio</h3>
+      <label for="portfolioName">Portfolio Name:</label>
+      <input type="text" id="portfolioName" required />
+      <label for="bankAccount">Bank:</label>
+      <input type="text" id="bankAccount" required />
+      <button id="submitNewPortfolio">Add Portfolio</button>
+    </div>
+
+    <!-- Portfolio Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Portfolio Name</th>
+          <th>Bank Account</th>
+          <th>24h Change</th>
+          <th>Last Trade</th>
+          <th>Total Value</th>
+        </tr>
+      </thead>
+      <tbody id="portfolioTableBody">
+        <tr>
+          <td>Growth Tech</td>
+          <td>Nordea DK</td>
+          <td class="green">+1.27%</td>
+          <td>01/02/2024 12:54</td>
+          <td>35,201 DKK</td>
+        </tr>
+        <tr>
+          <td>Tech Leaders</td>
+          <td>Nordea DK</td>
+          <td class="red">-1.21%</td>
+          <td>25/04/2024 14:14</td>
+          <td>11,000 DKK</td>
+        </tr>
+        <tr>
+          <td>ETF +</td>
+          <td>Danske Invest 2</td>
+          <td class="red">-2.13%</td>
+          <td>23/04/2024 12:11</td>
+          <td>7,584 DKK</td>
+        </tr>
+        <tr>
+          <td>Space & Defence</td>
+          <td>Danske Invest 2</td>
+          <td class="green">+0.10%</td>
+          <td>27/03/2024 20:14</td>
+          <td>6,842 DKK</td>
+        </tr>
+        <tr>
+          <td>E-Com</td>
+          <td>Danske Invest 3</td>
+          <td class="green">+0.32%</td>
+          <td>02/03/2024 12:51</td>
+          <td>6,500 DKK</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../JS/portfolios.js"></script>
 </body>
 </html>
+
 
