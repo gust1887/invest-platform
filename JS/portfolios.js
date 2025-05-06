@@ -63,3 +63,6 @@ submitNewPortfolio.addEventListener("click", function() {
     alert("Udfyld venligst alle felter.");
   }
 });
+
+
+//Skal sættes op med SQL og ALPA API for at få reelle tal ind. 
