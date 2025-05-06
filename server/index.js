@@ -13,7 +13,7 @@ const { getConnection } = require('./database');
 
 
 const app = express();
-const port = 5001;
+const port = 5000;
 
 app.use(express.json()); // Gør det muligt at læse JSON i req.body
 
@@ -72,9 +72,11 @@ app.get('/api/nogletal/:symbol', async (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/accounts', accountRoutes);
 
-
+app.use('/CSS', express.static(path.join(__dirname, '..', 'CSS'))); // CSS mappen ligger uden for server mappen
 app.use('/JS', express.static(path.join(__dirname, '..', 'JS'))); // JS mappen ligger uden for server mappen
 app.use(express.static(path.join(__dirname, '..', 'HTML')));  // HTML mappen ligger uden for server mappen
+app.use('/images', express.static(path.join(__dirname, '..', 'HTML', 'images')));
+
 
 // Hjemmeside rute (index.html)
 app.get('/', (req, res) => {
