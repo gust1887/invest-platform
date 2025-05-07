@@ -18,21 +18,28 @@ document.addEventListener('DOMContentLoaded', async () => {
             const accountBox = document.createElement('div');
             accountBox.className = 'account-box';
 
+            const selectedId = sessionStorage.getItem('selectedAccountId');
+            if (selectedId == account.id) {
+                accountBox.classList.add('selected'); // CSS-klassen 'selected'
+            }
+
+
             // Indsæt HTML-indhold til kontoen
             accountBox.innerHTML = `
-              <div class="account-left">
-                <div class="icon">👤</div>
-                <div class="info">
-                  <p><strong>Account:</strong> ${account.accountName}</p>
-                  <p><strong>Currency:</strong> ${account.currency}</p>
-                  <p><strong>Balance:</strong> ${Number(account.balance).toLocaleString('da-DK', { minimumFractionDigits: 2 })}</p>
-                </div>
+            <div class="account-left">
+              <div class="icon">👤</div>
+              <div class="info">
+                <p><strong>Account:</strong> ${account.accountName}</p>
+                <p><strong>Currency:</strong> ${account.currency}</p>
+                <p><strong>Balance:</strong> ${Number(account.balance).toLocaleString('da-DK', { minimumFractionDigits: 2 })}</p>
               </div>
-              <div class="account-actions">
-                <button class="transfer-btn">Transfer Money</button>
-                <button class="close-btn">${account.is_closed ? 'Reopen Account' : 'Close Account'}</button>
-              </div>
-            `;
+            </div>
+            <div class="account-actions">
+              <button class="select-btn">Select Account</button>
+              <button class="transfer-btn">Transfer Money</button>
+              <button class="close-btn">${account.is_closed ? 'Reopen Account' : 'Close Account'}</button>
+            </div>
+          `;
 
             // Tilføj boksen til siden
             mainContent.appendChild(accountBox);
@@ -40,6 +47,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Hent knapperne fra boksen
             const transferBtn = accountBox.querySelector('.transfer-btn');
             const closeBtn = accountBox.querySelector('.close-btn');
+            const selectBtn = accountBox.querySelector('.select-btn');
+
+            // Funktion: Vælg en konto
+            selectBtn.addEventListener('click', () => {
+                if (account.is_closed) {
+                    return alert("Du kan ikke vælge en lukket konto.");
+                }
+
+                sessionStorage.setItem('selectedAccountId', account.id);
+                alert(`Konto "${account.accountName}" er valgt.`);
+                location.reload(); // Genindlæs for at vise markering (valgfrit)
+            });
 
             // Funktion: Tilføj penge til kontoen
             transferBtn.addEventListener('click', async () => {
