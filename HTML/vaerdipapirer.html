@@ -4,15 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Securities Overview</title>
+
+  <!-- Tilføjer eksterne CSS-stylesheets -->
   <link rel="stylesheet" href="/CSS/portfolios.css" />
   <link rel="stylesheet" href="/CSS/userface.css" />
   <link rel="stylesheet" href="/CSS/bittheme.css" />
   <link rel="stylesheet" href="/CSS/værdipapirer.css" />
 </head>
 <body>
+  <!-- Venstresidet navigationsmenu (sidebar) -->
   <div class="sidebar">
-    <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo">
+    <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo" />
     <ul class="nav-links">
+      <!-- Navigationslinks -->
       <li><a href="dashboard.html">Dashboard</a></li>
       <li><a href="accounts.html">Accounts</a></li>
       <li><a href="portfolios.html">Portfolios</a></li>
@@ -20,19 +24,25 @@
     </ul>
   </div>
 
+  <!-- Hovedindholdets container -->
   <div class="container">
     <h1 id="portfolioHeading">Securities Overview</h1>
 
+    <!-- Øverste statistiksektion med samlet værdi og graf -->
     <div class="top-stats">
       <div class="box">
         <h3>Total Portfolio Value</h3>
+        <!-- Dynamisk værdi opdateres af JavaScript -->
         <p style="font-size: 24px;" id="totalValueDisplay">Loading...</p>
       </div>
+
+      <!-- Sektion til cirkeldiagrammet -->
       <div class="box chart-box">
         <canvas id="securitiesChart" width="400" height="400"></canvas>
       </div>
     </div>
 
+    <!-- Titel + Køb/Sælg knapper -->
     <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
       <h2>Securities in Portfolio</h2>
       <div>
@@ -41,6 +51,7 @@
       </div>
     </div>
 
+    <!-- Tabel over værdipapirer -->
     <table>
       <thead>
         <tr>
@@ -53,15 +64,15 @@
         </tr>
       </thead>
       <tbody id="securitiesTableBody">
-        <!-- Fyldes dynamisk af JS -->
+        <!-- Rækker genereres dynamisk via JavaScript -->
       </tbody>
     </table>
   </div>
 
-  <!-- Chart.js for diagrammet -->
+  <!-- Henter Chart.js til visning af graf -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Din JS-kode -->
+  <!-- Hoved-JavaScript til siden -->
   <script src="../JS/værdipapirer.js"></script>
 </body>
 </html>
