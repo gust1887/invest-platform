@@ -6,14 +6,14 @@ const userRoutes = require('./routes/userRoutes');
 const accountRoutes = require('./routes/accountRoutes');
 
 //API KEY 
-API_KEY = '67T6LZMPL60CMGW4'; 
+API_KEY = '15EZMJUM9BI0U3QQ'; 
 
 // Connection til SQL db 
 const { getConnection } = require('./database');
 
 
 const app = express();
-const port = 5001;
+const port = 5000;
 
 app.use(express.json()); // Gør det muligt at læse JSON i req.body
 
@@ -26,7 +26,7 @@ app.get('/api/:symbol', async(req,res) => {
   const svar = await fetch(url);
   const json = await svar.json();
   const data = json['Time Series (Daily)'];
-
+  
   // Hvis data ikke er opfyldt vil den returnere en intern data fejl (500)
   if(!data) return res.status(500).json({error: 'Data ikke fundet eller forkert navn'});
 
@@ -109,6 +109,11 @@ app.get('/accounts', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'HTML', 'accounts.html'));
 });
 
+//Køb af aktier
+
+app.get('/buystocks', (req, res) => {
+  res.sendFile(path.join(__dirname, '../HTML', 'buystocks.html'));
+});
 
 // Start serveren
 app.listen(port, () => {

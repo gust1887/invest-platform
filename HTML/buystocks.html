@@ -1,0 +1,107 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invest Platform - Dashboard</title>
+
+    <!-- CSS: Grundtema og Dashboard layout -->
+    <link rel="stylesheet" href="/CSS/bittheme.css">
+    <link rel="stylesheet" href="/CSS/dashboard.css">
+    <link rel="stylesheet" href="/CSS/userface.css">
+
+    <style>
+        /* Mindre og fleksibel sidebar-logo */
+        .sidebar-logo {
+            max-height: 60px;
+            width: auto;
+            display: block;
+            margin: 0 auto 20px auto; /* centreret med luft under */
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo">
+        <ul class="nav-links">
+            <li><a href="dashboard.html" class="active">Dashboard</a></li>
+            <li><a href="accounts.html">Accounts</a></li>
+            <li><a href="portfolios.html">Portfolios</a></li>
+        </ul>
+
+        <!-- Knapper i bunden til log ud samt ændre adgangskode -->
+        <div class="sidebar-bottom">
+            <button onclick="location.href='changepassword.html'">Change Password</button>
+            <button onclick="location.href='logout.html'">Log Out</button>
+        </div>
+    </div>
+
+    <!-- Hovedindhold -->
+    <div class="main-content">
+        <!-- Søgefelt -->
+        <input id="symbol" placeholder="Tickersymbol">
+        <button onclick="hent()">Search</button>
+
+        <!-- Graf -->
+        <canvas id="chart" width="70%" height="50"></canvas>
+
+        <!-- Nøgletal -->
+        <div id="key-metrics" style="margin-top: 30px;">
+            <h3>Key figures</h3>
+            <ul id="metrics-list"></ul>
+        </div>
+    </div>
+
+    <!-- Chart.js bibliotek + din eksisterende JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let graf;
+
+        function hent() {
+            const symbol = document.getElementById('symbol').value;
+
+            fetch(`/api/${symbol}`)
+                .then(res => res.json())
+                .then(data => {
+                    const datoer = data.map(d => d.dato);
+                    const priser = data.map(d => d.pris);
+
+                    const ctx = document.getElementById('chart').getContext('2d');
+                    if (graf) graf.destroy();
+
+                    graf = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: datoer,
+                            datasets: [{
+                                label: symbol,
+                                data: priser,
+                                borderColor: 'green'
+                            }]
+                        }
+                    });
+
+                    return fetch(`/api/nogletal/${symbol}`);
+                })
+                .then(res => res.json())
+                .then(nogletal => {
+                    console.log("Nøgletal modtaget:", nogletal);
+
+                    const list = document.getElementById('metrics-list');
+                    list.innerHTML = `
+                        <li><strong>P/E:</strong> ${nogletal.pe}</li>
+                        <li><strong>Volume:</strong> ${nogletal.volume}</li>
+                        <li><strong>Market Cap:</strong> ${nogletal.marketCap}</li>
+                        <li><strong>EPS:</strong> ${nogletal.eps}</li>
+                        <li><strong>Udbytte i procent (%):</strong> ${nogletal.dividendYield}</li>`;
+                })
+                .catch(err => {
+                    document.getElementById('metrics-list').innerHTML = '<li>Kunne ikke hente nøgletal</li>';
+                });
+        }
+    </script>
+</body>
+</html>
