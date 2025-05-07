@@ -29,7 +29,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
       sessionStorage.setItem('loggedInUser', username);
       sessionStorage.setItem('userId', data.userId); 
       document.getElementById('message').innerText = data.message || 'Login succesfuldt.';
-      window.location.href = '/dashboard'; // Send brugeren videre
+      window.location.href = '/accounts'; // Send brugeren videre
     } else {
       document.getElementById('message').innerText = data.error || 'Login mislykkedes.';
     }
