@@ -4,6 +4,8 @@ const path = require('path');
 const userRoutes = require('./routes/userRoutes');
 // Importerer alle ruter relateret til bankkonti (fx opret konto, indsæt penge)
 const accountRoutes = require('./routes/accountRoutes');
+// Importerer alle ruter relateret til portføljer
+const portfolioRoutes = require('./routes/portfolioRoutes');
 
 //API KEY 
 API_KEY = '15EZMJUM9BI0U3QQ'; 
@@ -71,6 +73,7 @@ app.get('/api/nogletal/:symbol', async (req, res) => {
  Eksempel: POST /api/users/opretbruger */
 app.use('/api/users', userRoutes);
 app.use('/api/accounts', accountRoutes);
+app.use('/api/portfolios', portfolioRoutes);
 
 app.use('/CSS', express.static(path.join(__dirname, '..', 'CSS'))); // CSS mappen ligger uden for server mappen
 app.use('/JS', express.static(path.join(__dirname, '..', 'JS'))); // JS mappen ligger uden for server mappen

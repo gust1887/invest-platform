@@ -1,164 +1,173 @@
-/* Portfolio stil */
+/* Overordnet stil for hele siden */
 body {
-    background-color: #0f0f0f;
-    color: white;
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    padding: 0;
-    height: 100vh; /* Gør kroppen høj nok til at fylde hele skærmen */
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .container {
-    margin-left: 240px; /* Sørg for, at containeren starter efter sidebar */
-    max-width: 1200px;
-    flex: 1; /* Gør containeren fleksibel og fylder resten af højden */
-    padding: 2rem;
-    overflow-y: auto; /* Gør det muligt at scrolle, hvis der er for meget indhold */
-  }
-  
-  h1 {
-    margin-bottom: 2rem;
-  }
-  
-  .top-stats {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-  }
-  
-  .box {
-    background-color: #1c1c1c;
-    padding: 1rem;
-    border-radius: 10px;
-    flex: 1;
-    min-width: 250px;
-  }
-  
-  .chart-box {
-    max-width: 400px;
-  }
-  
-  .green {
-    color: #4caf50;
-  }
-  
-  .red {
-    color: #f44336;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 2rem;
-    background-color: #1c1c1c;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  
-  th, td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid #333;
-  }
-  
-  th {
-    background-color: #222;
-    font-weight: 600;
-  }
-  
-  tr:last-child td {
-    border-bottom: none;
-  }
-  
-  .primary-button {
-    background-color: #2196f3;
-    color: white;
-    padding: 0.8rem 1.4rem;
-    font-size: 1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 1rem;
-  }
-  
-  .primary-button:hover {
-    background-color: #1976d2;
-  }
-  
-  .form-card {
-    background-color: #1c1c1c;
-    padding: 1.5rem;
-    border-radius: 10px;
-    margin-top: 2rem;
-    max-width: 500px;
-  }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1rem;
-  }
-  
-  .form-group label {
-    margin-bottom: 0.5rem;
-    color: #ccc;
-  }
-  
-  .form-group input {
-    padding: 0.7rem;
-    border-radius: 6px;
-    border: 1px solid #333;
-    background-color: #2c2c2c;
-    color: white;
-    font-size: 1rem;
-  }
-  
-  /* Sidebar */
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 220px;
-    background-color: #1c1c1c;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh; /* Sidebar skal fylde hele højden */
-  }
-  
-  .sidebar-logo {
-    width: 100px;
-    margin-bottom: 2rem;
-  }
-  
-  .nav-links {
-    list-style: none;
-    padding: 0;
-    width: 100%;
-  }
-  
-  .nav-links li {
-    margin: 1rem 0;
-  }
-  
-  .nav-links a {
-    color: #ccc;
-    text-decoration: none;
-    display: block;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    transition: background-color 0.2s;
-  }
-  
-  .nav-links a:hover,
-  .nav-links a.active {
-    background-color: #333;
-    color: white;
-  }
-  
+  background-color: #0f0f0f;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container for alt hovedindholdet */
+.container {
+  margin-left: 240px; /* Flyt indholdet væk fra venstre sidebar */
+  max-width: 1200px;
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* Overskrift */
+h1 {
+  margin-bottom: 2rem;
+}
+
+/* Statistiksektionen øverst */
+.top-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Boks med tekst eller grafik */
+.box {
+  background-color: #1c1c1c;
+  padding: 1rem;
+  border-radius: 10px;
+  flex: 1;
+  min-width: 250px;
+}
+
+/* Specifik stil for diagram-boksen */
+.chart-box {
+  max-width: 400px;
+}
+
+/* Grøn/rød tekst til visning af ændringer */
+.green {
+  color: #4caf50;
+}
+
+.red {
+  color: #f44336;
+}
+
+/* Tabel-stil */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+  background-color: #1c1c1c;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #333;
+}
+
+th {
+  background-color: #222;
+  font-weight: 600;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+/* Stil for Køb/Sælg-knapper */
+.primary-button {
+  background-color: #2196f3;
+  color: white;
+  padding: 0.8rem 1.4rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+.primary-button:hover {
+  background-color: #1976d2;
+}
+
+/* Stil til formular (hvis relevant i fremtiden) */
+.form-card {
+  background-color: #1c1c1c;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-top: 2rem;
+  max-width: 500px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+  color: #ccc;
+}
+
+.form-group input {
+  padding: 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background-color: #2c2c2c;
+  color: white;
+  font-size: 1rem;
+}
+
+/* Sidebar-styling */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 220px;
+  background-color: #1c1c1c;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+}
+
+.sidebar-logo {
+  width: 100px;
+  margin-bottom: 2rem;
+}
+
+/* Navigationslinks i sidebaren */
+.nav-links {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+
+.nav-links li {
+  margin: 1rem 0;
+}
+
+.nav-links a {
+  color: #ccc;
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  background-color: #333;
+  color: white;
+}

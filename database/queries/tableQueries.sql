@@ -17,6 +17,7 @@ CREATE TABLE Accounts (
     balance DECIMAL(18,2) DEFAULT 0,
     created_at DATETIME DEFAULT GETDATE(),
     closed_at DATETIME NULL,
+    is_closed BIT DEFAULT 0;
     FOREIGN KEY (user_id) REFERENCES Users(id)
 );
 
@@ -24,17 +25,19 @@ CREATE TABLE Accounts (
 CREATE TABLE Portfolios (
     id INT PRIMARY KEY IDENTITY(1,1),
     account_id INT NOT NULL,
-    name NVARCHAR(100) NOT NULL,
+    portfolioName NVARCHAR(100) NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (account_id) REFERENCES Accounts(id)
+    user_id INT,
+    FOREIGN KEY (account_id) REFERENCES Accounts(id),
+    FOREIGN KEY (user_id) REFERENCES Users(id)
 );
 
 -- Aktier/Securities
 CREATE TABLE Securities (
     id INT PRIMARY KEY IDENTITY(1,1),
-    name NVARCHAR(100) NOT NULL,
+    securitiesName NVARCHAR(100) NOT NULL,
     ticker NVARCHAR(10) NOT NULL UNIQUE,
-    type NVARCHAR(50) NOT NULL  -- fx Aktier, Obligationer, Kryptovaluta
+    securityType NVARCHAR(50) NOT NULL  -- fx Aktier, Obligationer, Kryptovaluta
 );
 
 -- Handler
