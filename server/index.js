@@ -13,7 +13,7 @@ const { getConnection } = require('./database');
 
 
 const app = express();
-const port = 5000;
+const port = 5001;
 
 app.use(express.json()); // Gør det muligt at læse JSON i req.body
 
