@@ -36,28 +36,66 @@ document.addEventListener("DOMContentLoaded", () => {
     newPortfolioForm.style.display = isVisible ? "none" : "block";
   });
 
-  submitNewPortfolio.addEventListener("click", function () {
+  submitNewPortfolio.addEventListener("click", async function () {
     const portfolioName = document.getElementById("portfolioName").value.trim();
     const bankAccount = document.getElementById("bankAccount").value.trim();
+    const accountId = sessionStorage.getItem("selectedAccountId");
 
+    // Hvis brugeren ikke har valgt en konto i accounts.html, vis advarsel
+    if (!accountId) {
+      alert("Du skal vælge en konto først (via Accounts-siden).");
+      return;
+    }
+
+    // Hvis begge felter er udfyldt...
     if (portfolioName && bankAccount) {
-      const newRow = document.createElement("tr");
-      newRow.innerHTML = `
-        <td><a href="vaerdipapirer.html?portfolio=${encodeURIComponent(portfolioName)}">${portfolioName}</a></td>
-        <td>${bankAccount}</td>
-        <td class="green">+0.00%</td>
-        <td>--/--/---- --:--</td>
-        <td>0 DKK</td>
-      `;
-      portfolioTableBody.appendChild(newRow);
+      try {
+        // Send POST-request til serveren for at oprette porteføljen i databasen
+        const res = await fetch('/api/portfolios', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            account_id: parseInt(accountId), // fra sessionStorage
+            portfolioName: portfolioName
+          })
+        });
 
-      newPortfolioForm.style.display = "none";
-      document.getElementById("portfolioName").value = "";
-      document.getElementById("bankAccount").value = "";
+        const result = await res.json();
+        // Hvis oprettelsen lykkes (status 201 fra serveren)
+        if (res.ok) {
+          // Tilføj porteføljen direkte til tabellen i brugerfladen
+          const newRow = document.createElement("tr");
+          newRow.innerHTML = `
+            <td><a href="vaerdipapirer.html?portfolio=${encodeURIComponent(portfolioName)}">${portfolioName}</a></td>
+            <td>${bankAccount}</td>
+            <td class="green">+0.00%</td>
+            <td>--/--/---- --:--</td>
+            <td>0 DKK</td>
+          `;
+          portfolioTableBody.appendChild(newRow);
+
+          // Ryd og skjul formularen
+          newPortfolioForm.style.display = "none";
+          document.getElementById("portfolioName").value = "";
+          document.getElementById("bankAccount").value = "";
+
+          // Vis en bekræftelse
+          alert("Portefølje oprettet!");
+        } else {
+          // Hvis serveren returnerer fejl
+          alert(result.error || "Fejl ved oprettelse.");
+        }
+      } catch (err) {
+        // Hvis fetch fejler (fx serveren er nede)
+        console.error(err);
+        alert("Serverfejl.");
+      }
     } else {
+      // Hvis brugeren ikke har udfyldt begge felter
       alert("Udfyld venligst alle felter.");
     }
   });
+
 
   // Make existing names clickable
   const rows = portfolioTableBody.getElementsByTagName("tr");
@@ -75,8 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cell.appendChild(link);
   }
 });
-
-
 
 
 //Skal sættes op med SQL og ALPA API for at få reelle tal ind. 

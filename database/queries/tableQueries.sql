@@ -25,7 +25,7 @@ CREATE TABLE Accounts (
 CREATE TABLE Portfolios (
     id INT PRIMARY KEY IDENTITY(1,1),
     account_id INT NOT NULL,
-    name NVARCHAR(100) NOT NULL,
+    portfolioName NVARCHAR(100) NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (account_id) REFERENCES Accounts(id)
 );
