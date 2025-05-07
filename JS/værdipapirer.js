@@ -1,40 +1,111 @@
-//LAVET MED CHAT
-// vaerdipapirer.js
-// Funktion til at beregne værdien af hvert værdipapir i en portefølje baseret på antal aktier og aktuel pris fra API
+// værdipapirer.js
+document.addEventListener("DOMContentLoaded", async () => {
+  const ALPHA_VANTAGE_API_KEY = 'T9RVKBMGMJ5YU5Z6'; // ← Udskift med din egen nøgle
 
-const axios = require('axios'); //Axios bruges til at hente data fra eksterne API’er – f.eks. Alpha Vantage. Må det bruges?
-const ALPHA_VANTAGE_API_KEY = 'din_api_nøgle';
+  const securities = [
+    { name: "Apple Inc.", symbol: "AAPL", shares: 20 },
+    { name: "Microsoft Corp.", symbol: "MSFT", shares: 15 },
+    { name: "iShares Core MSCI World ETF", symbol: "IWRD.LON", shares: 1 },
+    { name: "Tesla Inc.", symbol: "TSLA", shares: 5 },
+    { name: "Nvidia Corp.", symbol: "NVDA", shares: 6 }
+  ];
 
-// Funktion til at hente aktuel aktiekurs for en given symbol
-async function fetchStockPrice(symbol) {
-  try {
-    const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
-    const response = await axios.get(url);
-    const quote = response.data["Global Quote"];
-    const price = parseFloat(quote["05. price"]);
-    return price;
-  } catch (error) {
-    console.error(`Fejl ved hentning af pris for ${symbol}:`, error.message);
-    return 0; // fallback hvis fejl
+  async function fetchStockData(symbol) {
+    try {
+      const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log(`Data for ${symbol}:`, data); // DEBUG
+
+      if (!data["Global Quote"] || Object.keys(data["Global Quote"]).length === 0) {
+        console.warn(`No valid data for ${symbol}`);
+        return { price: 0, change: "N/A" };
+      }
+
+      const quote = data["Global Quote"];
+      const price = parseFloat(quote["05. price"]);
+      const changePercent = quote["10. change percent"] || "0%";
+
+      return {
+        price: isNaN(price) ? 0 : price,
+        change: changePercent
+      };
+    } catch (error) {
+      console.error(`Fejl ved hentning af data for ${symbol}:`, error);
+      return { price: 0, change: "?" };
+    }
   }
-}
 
-// Beregn værdien af hvert værdipapir
-async function calculateSecuritiesValue(securities) {
-  const result = [];
+  async function fetchAndDisplayData() {
+    const updatedSecurities = [];
 
-  for (const item of securities) {
-    const price = await fetchStockPrice(item.symbol);
-    const totalValue = price * item.shares;
-    result.push({
-      symbol: item.symbol,
-      shares: item.shares,
-      price: price,
-      totalValue: totalValue
+    for (const s of securities) {
+      const { price, change } = await fetchStockData(s.symbol);
+      const value = s.shares * price;
+
+      updatedSecurities.push({
+        name: s.name,
+        symbol: s.symbol,
+        shares: s.shares,
+        price,
+        value,
+        change
+      });
+    }
+
+    // Opdater total værdi
+    const total = updatedSecurities.reduce((sum, s) => sum + s.value, 0);
+    document.getElementById("totalValueDisplay").textContent = `${total.toFixed(2)} DKK`;
+
+    // Vis i tabel
+    const tableBody = document.getElementById("securitiesTableBody");
+    tableBody.innerHTML = "";
+    updatedSecurities.forEach(s => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${s.name}</td>
+        <td>${s.symbol}</td>
+        <td>${s.shares}</td>
+        <td>${s.price.toFixed(2)} DKK</td>
+        <td>${s.value.toFixed(2)} DKK</td>
+        <td>${s.change}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+
+    // Generer diagram
+    const labels = updatedSecurities.map(s => s.name);
+    const data = updatedSecurities.map(s => s.value);
+
+    const ctx = document.getElementById("securitiesChart").getContext("2d");
+    new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Portfolio Breakdown",
+          data: data,
+          backgroundColor: [
+            "#4CAF50", "#2196F3", "#FFC107", "#FF5722", "#9C27B0"
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'right'
+          },
+          title: {
+            display: true,
+            text: 'Securities Value Distribution'
+          }
+        }
+      }
     });
   }
 
-  return result;
-}
+  await fetchAndDisplayData();
+});
 
-module.exports = { fetchStockPrice, calculateSecuritiesValue };
