@@ -129,3 +129,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Kør når siden er loadet
   await fetchAndDisplayData();
 });
+
+
+
+// Når man trykker på buy button så kommer man videre til buyStocks.html
+function handleBuy() {
+  window.location.href = '/buystocks'
+};
+
+// Når man trykker på buy button så kommer man videre til sellStocks.html
+function handleSell() {
+  window.location.href = '/sellstocks'
+};

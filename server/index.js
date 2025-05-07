@@ -8,7 +8,7 @@ const accountRoutes = require('./routes/accountRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 
 //API KEY 
-API_KEY = '15EZMJUM9BI0U3QQ'; 
+const API_KEY = '15EZMJUM9BI0U3QQ'; 
 
 // Connection til SQL db 
 const { getConnection } = require('./database');
@@ -115,7 +115,12 @@ app.get('/accounts', (req, res) => {
 //Køb af aktier
 
 app.get('/buystocks', (req, res) => {
-  res.sendFile(path.join(__dirname, '../HTML', 'buystocks.html'));
+  res.sendFile(path.join(__dirname, '..', 'HTML', 'buystocks.html'));
+});
+
+//Salg af aktier
+app.get('/sellstocks', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'HTML', 'sellstocks.html'));
 });
 
 // Start serveren
