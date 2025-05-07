@@ -17,6 +17,7 @@ CREATE TABLE Accounts (
     balance DECIMAL(18,2) DEFAULT 0,
     created_at DATETIME DEFAULT GETDATE(),
     closed_at DATETIME NULL,
+    is_closed BIT DEFAULT 0;
     FOREIGN KEY (user_id) REFERENCES Users(id)
 );
 
