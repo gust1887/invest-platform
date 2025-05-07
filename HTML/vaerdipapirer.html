@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="/CSS/værdipapirer.css" />
 </head>
 <body>
-  <!-- Sidebar -->
   <div class="sidebar">
     <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo">
     <ul class="nav-links">
@@ -21,7 +20,6 @@
     </ul>
   </div>
 
-  <!-- Main content -->
   <div class="container">
     <h1 id="portfolioHeading">Securities Overview</h1>
 
@@ -30,16 +28,8 @@
         <h3>Total Portfolio Value</h3>
         <p style="font-size: 24px;" id="totalValueDisplay">Loading...</p>
       </div>
-      <div class="box">
-        <h3>Daily Change</h3>
-        <p class="green">+0.85%</p>
-        <h3>Weekly Change</h3>
-        <p class="red">-0.45%</p>
-        <h3>Monthly Change</h3>
-        <p class="green">+2.10%</p>
-      </div>
       <div class="box chart-box">
-        <canvas id="securitiesChart"></canvas>
+        <canvas id="securitiesChart" width="400" height="400"></canvas>
       </div>
     </div>
 
@@ -63,52 +53,17 @@
         </tr>
       </thead>
       <tbody id="securitiesTableBody">
-        <tr>
-          <td>Apple Inc.</td>
-          <td>AAPL</td>
-          <td>20</td>
-          <td>150.00 DKK</td>
-          <td>3000.00 DKK</td>
-          <td class="green">+1.50%</td>
-        </tr>
-        <tr>
-          <td>Microsoft Corp.</td>
-          <td>MSFT</td>
-          <td>15</td>
-          <td>250.00 DKK</td>
-          <td>3750.00 DKK</td>
-          <td class="red">-0.50%</td>
-        </tr>
-        <tr>
-          <td>iShares Core MSCI World ETF</td>
-          <td>IWRD.LON</td>
-          <td>1</td>
-          <td>450.00 DKK</td>
-          <td>450.00 DKK</td>
-          <td class="green">+0.20%</td>
-        </tr>
-        <tr>
-          <td>Tesla Inc.</td>
-          <td>TSLA</td>
-          <td>5</td>
-          <td>700.00 DKK</td>
-          <td>3500.00 DKK</td>
-          <td class="red">-2.10%</td>
-        </tr>
-        <tr>
-          <td>Nvidia Corp.</td>
-          <td>NVDA</td>
-          <td>6</td>
-          <td>800.00 DKK</td>
-          <td>4800.00 DKK</td>
-          <td class="green">+3.00%</td>
-        </tr>
+        <!-- Fyldes dynamisk af JS -->
       </tbody>
     </table>
   </div>
 
+  <!-- Chart.js for diagrammet -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Din JS-kode -->
   <script src="../JS/værdipapirer.js"></script>
 </body>
 </html>
+
 
