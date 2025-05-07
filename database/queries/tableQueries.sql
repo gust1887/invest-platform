@@ -27,7 +27,9 @@ CREATE TABLE Portfolios (
     account_id INT NOT NULL,
     portfolioName NVARCHAR(100) NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (account_id) REFERENCES Accounts(id)
+    user_id INT,
+    FOREIGN KEY (account_id) REFERENCES Accounts(id),
+    FOREIGN KEY (user_id) REFERENCES Users(id)
 );
 
 -- Aktier/Securities

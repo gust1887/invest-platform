@@ -25,11 +25,56 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+
+const portfolioTableBody = document.getElementById("portfolioTableBody");
+
+// Kør ved page load
+getAndShowPortfolios();
+
+
+
+// Henter og viser porteføljer for den valgte konto
+async function getAndShowPortfolios() {
+  const accountId = sessionStorage.getItem("selectedAccountId");
+
+  // Hvis der ikke er valgt konto, vis advarsel
+  if (!accountId) {
+    console.warn("❗ Ingen konto valgt – kan ikke hente porteføljer");
+    return;
+  }
+
+  try {
+    // Hent porteføljer fra serveren for den specifikke konto
+    const res = await fetch(`/api/portfolios/konto/${accountId}`);
+    const portfolios = await res.json();
+
+    // Slet eksisterende rows (fx hardkodede testdata)
+    portfolioTableBody.innerHTML = "";
+
+    // Tilføj hver portefølje som en række i tabellen
+    portfolios.forEach((p) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><a href="vaerdipapirer.html?portfolio=${encodeURIComponent(p.portfolioName)}">${p.portfolioName}</a></td>
+        <td>${p.account_id}</td>
+        <td class="green">+0.00%</td>
+        <td>--/--/----</td>
+        <td>0 DKK</td>
+      `;
+      portfolioTableBody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("Fejl ved hentning af porteføljer:", err);
+  }
+}
+
+
+
+
   // Tilføj portfølje funktionalitet
   const addPortfolioBtn = document.getElementById("addPortfolioBtn");
   const newPortfolioForm = document.getElementById("newPortfolioForm");
   const submitNewPortfolio = document.getElementById("submitNewPortfolio");
-  const portfolioTableBody = document.getElementById("portfolioTableBody");
 
   addPortfolioBtn.addEventListener("click", function () {
     const isVisible = newPortfolioForm.style.display === "block";
