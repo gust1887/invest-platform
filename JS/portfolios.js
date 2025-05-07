@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Add portfolio functionality
+  // Tilføj portfølje funktionalitet
   const addPortfolioBtn = document.getElementById("addPortfolioBtn");
   const newPortfolioForm = document.getElementById("newPortfolioForm");
   const submitNewPortfolio = document.getElementById("submitNewPortfolio");

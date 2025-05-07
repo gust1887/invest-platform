@@ -33,9 +33,9 @@ CREATE TABLE Portfolios (
 -- Aktier/Securities
 CREATE TABLE Securities (
     id INT PRIMARY KEY IDENTITY(1,1),
-    name NVARCHAR(100) NOT NULL,
+    securitiesName NVARCHAR(100) NOT NULL,
     ticker NVARCHAR(10) NOT NULL UNIQUE,
-    type NVARCHAR(50) NOT NULL  -- fx Aktier, Obligationer, Kryptovaluta
+    securityType NVARCHAR(50) NOT NULL  -- fx Aktier, Obligationer, Kryptovaluta
 );
 
 -- Handler
