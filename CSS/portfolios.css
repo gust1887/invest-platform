@@ -1,6 +1,5 @@
 /* Container for alt hovedindholdet */
 .container {
-  margin-left: 240px; /* Flyt indholdet væk fra venstre sidebar */
   max-width: 1200px;
   flex: 1;
   padding: 2rem;
@@ -112,50 +111,4 @@ tr:last-child td {
   background-color: #2c2c2c;
   color: white;
   font-size: 1rem;
-}
-
-/* Sidebar-styling */
-.sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 220px;
-  background-color: #1c1c1c;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-}
-
-.sidebar-logo {
-  width: 100px;
-  margin-bottom: 2rem;
-}
-
-/* Navigationslinks i sidebaren */
-.nav-links {
-  list-style: none;
-  padding: 0;
-  width: 100%;
-}
-
-.nav-links li {
-  margin: 1rem 0;
-}
-
-.nav-links a {
-  color: #ccc;
-  text-decoration: none;
-  display: block;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  transition: background-color 0.2s;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-  background-color: #333;
-  color: white;
 }
