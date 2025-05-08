@@ -8,7 +8,7 @@ const accountRoutes = require('./routes/accountRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 
 //API KEY 
-const API_KEY = '15EZMJUM9BI0U3QQ'; 
+const API_KEY = 'JKHJKNXLK7K3FNOF'; 
 
 // Connection til SQL db 
 const { getConnection } = require('./database');
@@ -67,6 +67,60 @@ app.get('/api/nogletal/:symbol', async (req, res) => {
     res.status(500).json({ error: 'Fejl ved hentning af nøgletal' });
   }
 });
+
+app.post('/api/buy', async (req, res) => {
+  const {symbol, amount, price, currency} = req.body;
+  const accountId = 1;
+  const totalPrice = amount * price;
+
+  try {
+    //Forbinder til databasen
+
+    const connection = await getConnection();
+    
+    //Henter bruger ids balance 
+    const result = await connection.request()
+    .input('accountId', sql.Int, accountId)
+    .query('SELECT balance FROM dbo.Accounts WHERE id = @accountId');
+
+    if(result.recordset.length === 0) {
+      return res.status(404).json({success: false, message: 'Acount couldnt be found'});
+
+    }
+    const balance = result.recordset[0].balance;    
+    //Tjekker om der er penge nok
+    if(balance < totalPrice) {
+      return res.status(404).json({succes: false, message: 'Not enough money on the acount'});
+    }
+
+    await connection.request()
+    .input('totalPrice', sql.Decimal(18,2), totalPrice)
+    .input('accountId', sql.Int, accountId)
+    .query('UPDATE dbo.Accounts SET balance = balance - @totalPrice WHERE id = @accountId');
+
+    await connection.request()
+    .input('accountId', sql.Int, accountId)
+    .input('symbol', sql.NVarChar(10), symbol)
+    .input('amount', sql.Int, amount)
+    .input('price', sql.Decimal(18, 2), price)
+    .input('currency', sql.NVarChar(10), currency)
+    .query(`INSERT INTO dbo.Trades (account_id, security_id, quantity, total_price, trade_type, fee) 
+                VALUES (@accountId, @symbol, @amount, @price, 'BUY', 0.00)`);
+    
+    //Kommer tilbage succesfyldt til frontend
+    res.status(200).json({suceess: true, message: 'Went through'});
+
+    } catch(error) {
+      console.error("Something went wrong trying to buy the stock", error.message);
+      res.status(500).json({succes: false, message: 'Something happent to the server'})
+    }
+
+});
+
+
+
+
+
 
 /* Når klienten besøger en sti, der starter med f.eks. /api/users,
  så videresendes det til de ruter, der er defineret i userRoutes.js
