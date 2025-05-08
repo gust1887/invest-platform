@@ -56,7 +56,6 @@ async function getAndShowPortfolios() {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td><a href="vaerdipapirer.html?portfolio=${encodeURIComponent(p.portfolioName)}">${p.portfolioName}</a></td>
-        <td>${p.account_id}</td>
         <td class="green">+0.00%</td>
         <td>--/--/----</td>
         <td>0 DKK</td>
@@ -83,7 +82,6 @@ async function getAndShowPortfolios() {
 
   submitNewPortfolio.addEventListener("click", async function () {
     const portfolioName = document.getElementById("portfolioName").value.trim();
-    const bankAccount = document.getElementById("bankAccount").value.trim();
     const accountId = sessionStorage.getItem("selectedAccountId");
 
     // Hvis brugeren ikke har valgt en konto i accounts.html, vis advarsel
@@ -93,7 +91,7 @@ async function getAndShowPortfolios() {
     }
 
     // Hvis begge felter er udfyldt...
-    if (portfolioName && bankAccount) {
+    if (portfolioName) {
       try {
         // Send POST-request til serveren for at oprette porteføljen i databasen
         const res = await fetch('/api/portfolios', {
@@ -112,7 +110,6 @@ async function getAndShowPortfolios() {
           const newRow = document.createElement("tr");
           newRow.innerHTML = `
             <td><a href="vaerdipapirer.html?portfolio=${encodeURIComponent(portfolioName)}">${portfolioName}</a></td>
-            <td>${bankAccount}</td>
             <td class="green">+0.00%</td>
             <td>--/--/---- --:--</td>
             <td>0 DKK</td>
@@ -122,7 +119,6 @@ async function getAndShowPortfolios() {
           // Ryd og skjul formularen
           newPortfolioForm.style.display = "none";
           document.getElementById("portfolioName").value = "";
-          document.getElementById("bankAccount").value = "";
 
           // Vis en bekræftelse
           alert("Portefølje oprettet!");
