@@ -11,6 +11,7 @@ body {
 
 /* Sidebar */
 .sidebar {
+  position: relative;
   width: 220px;
   background-color: #1a1a1a;
   padding: 20px;
@@ -71,21 +72,20 @@ body {
   overflow-y: auto;
 }
 
-
-
 /* Buttons in the bottom - Change password and log out */
 .sidebar-bottom {
   position: absolute;
   bottom: 20px;
   left: 20px;
   right: 20px;
-  height: auto;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   z-index: 1;
 }
 
 .sidebar-bottom button {
-  width:13%;
+  width: 100%;
   padding: 10px;
   background-color: #333;
   color: white;
@@ -95,7 +95,6 @@ body {
   cursor: pointer;
   text-align: center;
   transition: background-color 0.2s ease;
-  
 }
 
 .sidebar-bottom button:hover {
