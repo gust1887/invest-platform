@@ -1,62 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invest Platform - Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
 
-    <!-- CSS: Grundtema og Dashboard layout -->
-    <link rel="stylesheet" href="/CSS/bittheme.css">
-    <link rel="stylesheet" href="/CSS/dashboard.css">
-    <link rel="stylesheet" href="/CSS/userface.css">
+  <link rel="stylesheet" href="/CSS/bittheme.css" />
+  <link rel="stylesheet" href="/CSS/userface.css" />
+  <link rel="stylesheet" href="/CSS/dashboard.css" />
+  <link rel="stylesheet" href="/CSS/portfolios.css" />
 
-    <style>
-        /* Mindre og fleksibel sidebar-logo */
-        .sidebar-logo {
-            max-height: 60px;
-            width: auto;
-            display: block;
-            margin: 0 auto 20px auto; /* centreret med luft under */
-        }
-    </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo">
-        <ul class="nav-links">
-            <li><a href="dashboard.html" class="active">Dashboard</a></li>
-            <li><a href="accounts.html">Accounts</a></li>
-            <li><a href="portfolios.html">Portfolios</a></li>
-        </ul>
-
-        <!-- Knapper i bunden til log ud samt ændre adgangskode -->
-        <div class="sidebar-bottom">
-            <button onclick="location.href='changepassword.html'">Change Password</button>
-            <button onclick="location.href='logout.html'">Log Out</button>
-        </div>
+    
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo">
+    <ul class="nav-links">
+      <li><a href="dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="accounts.html">Accounts</a></li>
+      <li><a href="portfolios.html">Portfolios</a></li>
+    </ul>
+    <div class="sidebar-bottom">
+      <button onclick="location.href='changepassword.html'">Change Password</button>
+      <button onclick="location.href='logout.html'">Log Out</button>
     </div>
+  </div>
 
-    <!-- Dashboard kort -->
+  <!-- Main Content -->
+  <div class="dashboard-content">
+    <!-- Top Summary Cards -->
     <div class="dashboard-cards">
-        <div class="dashboard-card">
-            <h4>Total værdi</h4>
-            <p class="card-value">224.543 DKK</p>
-            <p class="card-sub">+2.4%</p>
-        </div>
-
-        <div class="dashboard-card">
-            <h4>Realiseret gevinst</h4>
-            <p class="card-value">10.241 DKK</p>
-            <p class="card-sub">+5.1%</p>
-        </div>
-
-        <div class="dashboard-card">
-            <h4>Urealiseret gevinst</h4>
-            <p class="card-value">25.015 DKK</p>
-            <p class="card-sub">−0.8%</p>
-        </div>
+      <div class="dashboard-card" id="totalValueCard">
+        <h4>Total Value</h4>
+        <p class="card-value">Loading...</p>
+      </div>
+      <div class="dashboard-card" id="realizedProfitCard">
+        <h4>Total Realized Profit</h4>
+        <p class="card-value">Loading...</p>
+      </div>
+      <div class="dashboard-card" id="unrealizedProfitCard">
+        <h4>Total Unrealized Profit</h4>
+        <p class="card-value">Loading...</p>
+      </div>
     </div>
 
+    <!-- Portfolio Value Chart -->
+    <div class="dashboard-graph">
+      <h4>Portfolio Value</h4>
+      <canvas id="performanceChart"></canvas>
+    </div>
+
+    <!-- Bottom Data Boxes -->
+    <div class="dashboard-bottom">
+      <div class="dashboard-box" id="topValueSecurities">
+        <h4>Top 5 Securities by Value</h4>
+        <ul id="valueList">Loading...</ul>
+      </div>
+      <div class="dashboard-box" id="topProfitSecurities">
+        <h4>Top 5 Securities by Profit</h4>
+        <ul id="profitList">Loading...</ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="/JS/dashboard.js"></script>
 </body>
 </html>
+
