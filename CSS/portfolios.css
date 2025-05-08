@@ -1,20 +1,30 @@
+/* Overordnet stil for hele siden */
 body {
   background-color: #0f0f0f;
   color: white;
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
-  padding: 2rem;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Container for alt hovedindholdet */
 .container {
-  margin-left: 240px;
+  margin-left: 240px; /* Flyt indholdet væk fra venstre sidebar */
   max-width: 1200px;
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
 }
 
+/* Overskrift */
 h1 {
   margin-bottom: 2rem;
 }
 
+/* Statistiksektionen øverst */
 .top-stats {
   display: flex;
   gap: 1rem;
@@ -22,6 +32,7 @@ h1 {
   flex-wrap: wrap;
 }
 
+/* Boks med tekst eller grafik */
 .box {
   background-color: #1c1c1c;
   padding: 1rem;
@@ -30,10 +41,12 @@ h1 {
   min-width: 250px;
 }
 
+/* Specifik stil for diagram-boksen */
 .chart-box {
   max-width: 400px;
 }
 
+/* Grøn/rød tekst til visning af ændringer */
 .green {
   color: #4caf50;
 }
@@ -42,6 +55,7 @@ h1 {
   color: #f44336;
 }
 
+/* Tabel-stil */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -66,6 +80,7 @@ tr:last-child td {
   border-bottom: none;
 }
 
+/* Stil for Køb/Sælg-knapper */
 .primary-button {
   background-color: #2196f3;
   color: white;
@@ -82,6 +97,7 @@ tr:last-child td {
   background-color: #1976d2;
 }
 
+/* Stil til formular (hvis relevant i fremtiden) */
 .form-card {
   background-color: #1c1c1c;
   padding: 1.5rem;
@@ -110,6 +126,7 @@ tr:last-child td {
   font-size: 1rem;
 }
 
+/* Sidebar-styling */
 .sidebar {
   position: fixed;
   left: 0;
@@ -121,6 +138,7 @@ tr:last-child td {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100vh;
 }
 
 .sidebar-logo {
@@ -128,6 +146,7 @@ tr:last-child td {
   margin-bottom: 2rem;
 }
 
+/* Navigationslinks i sidebaren */
 .nav-links {
   list-style: none;
   padding: 0;
