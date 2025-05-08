@@ -4,20 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard</title>
-
   <link rel="stylesheet" href="/CSS/bittheme.css" />
   <link rel="stylesheet" href="/CSS/userface.css" />
   <link rel="stylesheet" href="/CSS/dashboard.css" />
-  <link rel="stylesheet" href="/CSS/portfolios.css" />
-
-  <!-- Kun én Chart.js import -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    
-  <!-- Sidebar -->
+
   <div class="sidebar">
-    <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo">
+    <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo" />
     <ul class="nav-links">
       <li><a href="dashboard.html" class="active">Dashboard</a></li>
       <li><a href="accounts.html">Accounts</a></li>
@@ -29,44 +23,65 @@
     </div>
   </div>
 
-  <!-- Main Content -->
-  <div class="dashboard-content">
-    <!-- Top Summary Cards -->
-    <div class="dashboard-cards">
-      <div class="dashboard-card" id="totalValueCard">
-        <h4>Total Value</h4>
-        <p class="card-value">Loading...</p>
+  <div class="container">
+    <h1>Portfolio Dashboard</h1>
+
+    <!-- Øverste bokse -->
+    <div class="top-stats">
+      <div class="box">
+        <h3>Total Portfolio Value</h3>
+        <p class="big-number" id="totalValue">224.543 DKK</p>
       </div>
-      <div class="dashboard-card" id="realizedProfitCard">
-        <h4>Total Realized Profit</h4>
-        <p class="card-value">Loading...</p>
+      <div class="box">
+        <h3>Total Realized Gain</h3>
+        <p class="big-number" id="realizedGain">+8.234 DKK</p>
       </div>
-      <div class="dashboard-card" id="unrealizedProfitCard">
-        <h4>Total Unrealized Profit</h4>
-        <p class="card-value">Loading...</p>
+      <div class="box">
+        <h3>Total Unrealized Gain</h3>
+        <p class="big-number" id="unrealizedGain">+12.321 DKK</p>
       </div>
     </div>
 
-    <!-- Portfolio Value Chart -->
-    <div class="dashboard-graph">
-      <h4>Portfolio Value</h4>
-      <canvas id="performanceChart" width="400" height="200"></canvas>
+    <!-- Graf -->
+    <div class="chart-container">
+      <canvas id="yearChart"></canvas>
     </div>
 
-    <!-- Bottom Data Boxes -->
-    <div class="dashboard-bottom">
-      <div class="dashboard-box" id="topValueSecurities">
-        <h4>Top 5 Securities by Value</h4>
-        <ul id="valueList">Loading...</ul>
+    <!-- Bundelementer -->
+    <div class="bottom-boxes">
+      <div class="table-box">
+        <h3>Top 5 Securities by Value</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Value (DKK)</th>
+            </tr>
+          </thead>
+          <tbody id="topValueTable">
+            <!-- Fyldes med JS -->
+          </tbody>
+        </table>
       </div>
-      <div class="dashboard-box" id="topProfitSecurities">
-        <h4>Top 5 Securities by Profit</h4>
-        <ul id="profitList">Loading...</ul>
+
+      <div class="table-box">
+        <h3>Top 5 Securities by Profit</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Profit (DKK)</th>
+            </tr>
+          </thead>
+          <tbody id="topProfitTable">
+            <!-- Fyldes med JS -->
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
-  
-  <!-- Korrekt sti til JS -->
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../JS/dashboard.js"></script>
 </body>
 </html>
