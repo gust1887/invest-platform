@@ -84,7 +84,7 @@ router.put('/:account_id/status', async (req, res) => {
 
 
 
-// PUT /api/accounts/addbalance – tilføj beløb til konto
+// PUT /api/accounts/addbalance – tilføj/hæv beløb til konto
 router.put('/addbalance', async (req, res) => {
     const { accountId, amount } = req.body;
 
@@ -97,7 +97,7 @@ router.put('/addbalance', async (req, res) => {
             .query('SELECT is_closed FROM Accounts WHERE id = @accountId');
 
         if (check.recordset[0].is_closed) {
-            return res.status(400).json({ error: 'Kontoen er lukket og kan ikke tilføjes penge' });
+            return res.status(400).json({ error: 'Kontoen er lukket og der kan ikke overføres penge' });
         }
 
         await pool.request()
@@ -105,14 +105,12 @@ router.put('/addbalance', async (req, res) => {
             .input('amount', sql.Money, amount)
             .query('UPDATE Accounts SET balance = balance + @amount WHERE id = @accountId');
 
-        res.status(200).json({ message: 'Beløb tilføjet' });
+        res.status(200).json({ message: 'Beløb overført' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Fejl ved tilføjelse af penge' });
+        res.status(500).json({ error: 'Fejl ved overførsel af penge' });
     }
 });
-
-
 
 
 // Eksporterer routeren, så den kan bruges i index.js via app.use(...)

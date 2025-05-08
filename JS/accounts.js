@@ -52,21 +52,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Funktion: Vælg en konto
             selectBtn.addEventListener('click', () => {
                 if (account.is_closed) {
-                    return alert("Du kan ikke vælge en lukket konto.");
+                    return alert("You cannot choose a closed account");
                 }
 
                 sessionStorage.setItem('selectedAccountId', account.id);
                 alert(`Konto "${account.accountName}" er valgt.`);
-                location.reload(); // Genindlæs for at vise markering (valgfrit)
+                location.reload(); // Genindlæs for at vise markering
             });
 
             // Funktion: Tilføj penge til kontoen
             transferBtn.addEventListener('click', async () => {
                 if (account.is_closed) {
-                    return alert("Denne konto er lukket og kan ikke tilføjes penge.");
+                    return alert("This account is closed and money could not be transferred.");
                 }
 
-                const amount = prompt("Indtast beløb der skal tilføjes:");
+                const amount = prompt("Indtast beløb der skal overføres:");
                 if (!amount || isNaN(amount)) return;
 
                 // Send PUT-request til backend for at opdatere balancen
@@ -81,18 +81,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const result = await res.json();
                 if (res.ok) {
-                    alert('Penge tilføjet');
+                    alert('Money transfered');
                     location.reload(); // Opdater siden for at vise ny balance
                 } else {
-                    alert(result.error || 'Fejl ved tilføjelse');
+                    alert(result.error || 'Error during transfer');
                 }
             });
 
             // Funktion: Luk eller genåbn konto
             closeBtn.addEventListener('click', async () => {
                 const confirmMsg = account.is_closed
-                    ? 'Vil du genåbne kontoen?'
-                    : 'Er du sikker på, at du vil lukke kontoen?';
+                    ? 'Do you want to reopen the account?'
+                    : 'Are you sure you want to close this account?';
 
                 if (confirm(confirmMsg)) {
                     const res = await fetch(`/api/accounts/${account.id}/status`, {
@@ -102,10 +102,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
 
                     if (res.ok) {
-                        alert(account.is_closed ? 'Konto genåbnet' : 'Konto lukket');
+                        alert(account.is_closed ? 'Account reopened' : 'Account closed');
                         location.reload();
                     } else {
-                        alert('Fejl ved opdatering af konto');
+                        alert('Error when updating account');
                     }
                 }
             });
@@ -114,11 +114,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         //  Knappen til at oprette en ny konto
         const addBtn = document.createElement('button');
         addBtn.className = 'add-account-btn';
-        addBtn.textContent = '+ Tilføj konto';
+        addBtn.textContent = '+ Add account';
         addBtn.onclick = () => window.location.href = '/opretkonto';
         mainContent.appendChild(addBtn);
 
     } catch (err) {
-        console.error("Fejl ved hentning af konti:", err);
+        console.error("Error when loading account:", err);
     }
 });
