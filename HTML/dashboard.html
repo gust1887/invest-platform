@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/CSS/dashboard.css" />
   <link rel="stylesheet" href="/CSS/portfolios.css" />
 
+  <!-- Kun én Chart.js import -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -49,7 +50,7 @@
     <!-- Portfolio Value Chart -->
     <div class="dashboard-graph">
       <h4>Portfolio Value</h4>
-      <canvas id="performanceChart"></canvas>
+      <canvas id="performanceChart" width="400" height="200"></canvas>
     </div>
 
     <!-- Bottom Data Boxes -->
@@ -64,8 +65,9 @@
       </div>
     </div>
   </div>
-
-  <script src="/JS/dashboard.js"></script>
+  
+  <!-- Korrekt sti til JS -->
+  <script src="../JS/dashboard.js"></script>
 </body>
 </html>
 
