@@ -78,5 +78,37 @@ router.post('/login', async (req, res) => {
 });
 
 
+
+
+// Ændre adgangskode
+router.post('/change-password', async (req, res) => {
+  const { username, email, newPassword } = req.body;
+
+  try {
+    const pool = await getConnection();
+
+    const result = await pool.request()
+      .input('username', sql.NVarChar, username)
+      .input('email', sql.NVarChar, email)
+      .input('newPassword', sql.NVarChar, newPassword)
+      .query(`
+        UPDATE Users
+        SET password = @newPassword
+        WHERE username = @username AND email = @email
+      `);
+
+    if (result.rowsAffected[0] === 0) {
+      return res.status(404).json({ error: 'Bruger ikke fundet eller email stemmer ikke.' });
+    }
+
+    res.status(200).json({ message: 'Adgangskode opdateret!' });
+  } catch (err) {
+    console.error("Fejl ved opdatering af adgangskode:", err);
+    res.status(500).json({ error: 'Serverfejl ved opdatering.' });
+  }
+});
+
+
+
 // Eksporterer routeren så den kan bruges i index.js
 module.exports = router;
