@@ -1,7 +1,13 @@
+.dashboard-content {
+  margin-left: 250px;
+  padding: 40px;
+  color: white;
+}
+
+/* Summary Cards */
 .dashboard-cards {
   display: flex;
   gap: 20px;
-  padding: 40px;
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -13,7 +19,6 @@
   color: white;
   width: 250px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  text-align: left;
   transition: transform 0.2s ease;
 }
 
@@ -24,10 +29,43 @@
 .card-value {
   font-size: 1.4rem;
   font-weight: bold;
-  margin: 8px 0;
+  margin-top: 10px;
 }
 
-.card-sub {
-  font-size: 0.9rem;
-  color: #aaa;
+/* Graph Section */
+.dashboard-graph {
+  margin-top: 40px;
+  background-color: #1a1a1a;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Bottom Boxes */
+.dashboard-bottom {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.dashboard-box {
+  flex: 1;
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 15px;
+  min-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dashboard-box h4 {
+  margin-bottom: 10px;
+}
+
+.dashboard-box ul {
+  list-style: none;
+  padding-left: 0;
+  line-height: 1.6;
+  color: #ccc;
 }
