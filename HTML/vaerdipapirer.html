@@ -3,25 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Securities Overview</title>
-
-  <!-- Tilføjer eksterne CSS-stylesheets -->
-  <link rel="stylesheet" href="/CSS/portfolios.css" />
-  <link rel="stylesheet" href="/CSS/userface.css" />
-  <link rel="stylesheet" href="/CSS/bittheme.css" />
-  <link rel="stylesheet" href="/CSS/værdipapirer.css" />
+  <title>Portfolio Overview</title>
+  <link rel="stylesheet" href="/CSS/portfolio.css">
+  <link rel="stylesheet" href="/CSS/bittheme.css">
+  <link rel="stylesheet" href="/CSS/userface.css">
 </head>
 <body>
-  <!-- Venstresidet navigationsmenu (sidebar) -->
+
+  <!-- Sidebar -->
   <div class="sidebar">
-    <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo" />
+    <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo">
     <ul class="nav-links">
-      <!-- Navigationslinks -->
       <li><a href="dashboard.html">Dashboard</a></li>
       <li><a href="accounts.html">Accounts</a></li>
-      <li><a href="portfolios.html">Portfolios</a></li>
-      <li><a href="vaerdipapirer.html" class="active">Securities</a></li>
+      <li><a href="portfolios.html" class="active">Portfolios</a></li>
     </ul>
+    <div class="sidebar-bottom">
+      <button onclick="location.href='changepassword.html'">Change Password</button>
+      <button onclick="location.href='logout.html'">Log Out</button>
+    </div>
   </div>
 
   <!-- Hovedindholdets container -->
