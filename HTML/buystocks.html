@@ -143,9 +143,6 @@
 
             if (!symbol || !amount || !price || price <= 0 || amount <= 0) {
                 document.getElementById('buy-message').innerText = "Ugyldige værdier";
-            if (!symbol || !amount || !price || price <= 0 || amount <= 0 || !accountId) {
-                document.getElementById('buy-message').innerText = "Ugyldige værdier eller konto mangler";
-                return;
             }
 
             fetch('/api/buy', {
@@ -153,12 +150,12 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ symbol, amount, price, currency, accountId: parseInt(accountId)  })
+                body: JSON.stringify({ symbol, amount, price, currency, accountId: parseInt(accountId)})
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById('buy-message').innerText = "Succesful buy";
+                    document.getElementById('buy-message').innerText = "Succesfully bought";
                 } else {
                     document.getElementById('buy-message').innerText = data.message;
                 }
@@ -170,3 +167,4 @@
     </script>
 </body>
 </html>
+

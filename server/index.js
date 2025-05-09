@@ -70,8 +70,6 @@ app.get('/api/nogletal/:symbol', async (req, res) => {
 });
 
 app.post('/api/buy', async (req, res) => {
-  const { symbol, amount, price, currency } = req.body;
-  const accountId = 1;
   const {symbol, amount, price, currency, accountId} = req.body;
   const totalPrice = amount * price;
 
@@ -79,22 +77,19 @@ app.post('/api/buy', async (req, res) => {
     // Forbinder til databasen
     const connection = await getConnection();
     
-    console.log("Søger efter ticker i databasen:", symbol);
 
     // Der søges i dbo.Securities for at finde ID på baggrund af ticker
     let securityResult = await connection.request()
       .input('ticker', sql.NVarChar(10), symbol)
       .query('SELECT id FROM dbo.Securities WHERE ticker = @ticker');
 
-    console.log("Resultat fra database:", securityResult.recordset);
 
     // Hvis aktien ikke findes, opretter vi den
     if (securityResult.recordset.length === 0) {
-      console.log("Aktie ikke fundet, opretter nu...");
       const insertResult = await connection.request()
         .input('ticker', sql.NVarChar(10), symbol)
-        .input('name', sql.NVarChar(50), symbol) // Her kan du ændre til et reelt navn hvis du vil
-        .input('market', sql.NVarChar(10), 'Unknown') // Opdater med den rigtige markedsplads hvis du har den
+        .input('name', sql.NVarChar(50), symbol)
+        .input('market', sql.NVarChar(10), 'Unknown') 
         .input('currency', sql.NVarChar(10), currency)
         .query('INSERT INTO dbo.Securities (ticker, name, market, currency) OUTPUT INSERTED.id VALUES (@ticker, @name, @market, @currency)');
 
@@ -111,7 +106,7 @@ app.post('/api/buy', async (req, res) => {
       .query('SELECT balance FROM dbo.Accounts WHERE id = @accountId');
 
     if (result.recordset.length === 0) {
-      return res.status(404).json({ success: false, message: 'Account could not be found' });
+      return res.status(404).json({ success: false, message: 'Account couldnt be found' });
     }
 
     const balance = result.recordset[0].balance;
@@ -137,10 +132,9 @@ app.post('/api/buy', async (req, res) => {
       .query(`INSERT INTO dbo.Trades (account_id, security_id, quantity, total_price, trade_type, fee) 
               VALUES (@accountId, @securityId, @amount, @totalPrice, 'BUY', 0.00)`);
 
-    res.status(200).json({ success: true, message: 'Went through' });
+    res.status(200).json({ success: true, message: 'It went thruogh' });
 
   } catch (error) {
-    console.error("Something went wrong trying to buy the stock", error.message);
     res.status(500).json({ success: false, message: 'Something happened to the server' });
   }
 });
