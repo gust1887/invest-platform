@@ -8,7 +8,7 @@ const accountRoutes = require('./routes/accountRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 
 //API KEY 
-const API_KEY = '3O8LCORJTMKH45SF'; 
+const API_KEY = 'RCTJI068TP44H9BP'; 
 
 // Connection til SQL db 
 const { getConnection } = require('./database');
