@@ -8,10 +8,11 @@ const accountRoutes = require('./routes/accountRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 
 //API KEY 
-const API_KEY = 'JKHJKNXLK7K3FNOF'; 
+const API_KEY = '3O8LCORJTMKH45SF'; 
 
 // Connection til SQL db 
 const { getConnection } = require('./database');
+const sql = require('mssql');
 
 
 const app = express();
@@ -69,56 +70,79 @@ app.get('/api/nogletal/:symbol', async (req, res) => {
 });
 
 app.post('/api/buy', async (req, res) => {
-  const {symbol, amount, price, currency} = req.body;
+  const { symbol, amount, price, currency } = req.body;
   const accountId = 1;
   const totalPrice = amount * price;
 
   try {
-    //Forbinder til databasen
-
+    // Forbinder til databasen
     const connection = await getConnection();
     
-    //Henter bruger ids balance 
+    console.log("Søger efter ticker i databasen:", symbol);
+
+    // Der søges i dbo.Securities for at finde ID på baggrund af ticker
+    let securityResult = await connection.request()
+      .input('ticker', sql.NVarChar(10), symbol)
+      .query('SELECT id FROM dbo.Securities WHERE ticker = @ticker');
+
+    console.log("Resultat fra database:", securityResult.recordset);
+
+    // Hvis aktien ikke findes, opretter vi den
+    if (securityResult.recordset.length === 0) {
+      console.log("Aktie ikke fundet, opretter nu...");
+      const insertResult = await connection.request()
+        .input('ticker', sql.NVarChar(10), symbol)
+        .input('name', sql.NVarChar(50), symbol) // Her kan du ændre til et reelt navn hvis du vil
+        .input('market', sql.NVarChar(10), 'Unknown') // Opdater med den rigtige markedsplads hvis du har den
+        .input('currency', sql.NVarChar(10), currency)
+        .query('INSERT INTO dbo.Securities (ticker, name, market, currency) OUTPUT INSERTED.id VALUES (@ticker, @name, @market, @currency)');
+
+      securityResult = insertResult;
+      console.log("Aktie oprettet med ID:", securityResult.recordset[0].id);
+    }
+
+    // Henter det korrekte ID
+    const securityId = securityResult.recordset[0].id;
+
+    // Henter brugerens balance
     const result = await connection.request()
-    .input('accountId', sql.Int, accountId)
-    .query('SELECT balance FROM dbo.Accounts WHERE id = @accountId');
+      .input('accountId', sql.Int, accountId)
+      .query('SELECT balance FROM dbo.Accounts WHERE id = @accountId');
 
-    if(result.recordset.length === 0) {
-      return res.status(404).json({success: false, message: 'Acount couldnt be found'});
-
-    }
-    const balance = result.recordset[0].balance;    
-    //Tjekker om der er penge nok
-    if(balance < totalPrice) {
-      return res.status(404).json({succes: false, message: 'Not enough money on the acount'});
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ success: false, message: 'Account could not be found' });
     }
 
+    const balance = result.recordset[0].balance;
+
+    // Tjekker om der er penge nok
+    if (balance < totalPrice) {
+      return res.status(404).json({ success: false, message: 'Not enough money in the account' });
+    }
+
+    // Trækker beløbet fra kontoen
     await connection.request()
-    .input('totalPrice', sql.Decimal(18,2), totalPrice)
-    .input('accountId', sql.Int, accountId)
-    .query('UPDATE dbo.Accounts SET balance = balance - @totalPrice WHERE id = @accountId');
+      .input('totalPrice', sql.Decimal(18, 2), totalPrice)
+      .input('accountId', sql.Int, accountId)
+      .query('UPDATE dbo.Accounts SET balance = balance - @totalPrice WHERE id = @accountId');
 
+    // Indsætter i dbo.Trades
     await connection.request()
-    .input('accountId', sql.Int, accountId)
-    .input('symbol', sql.NVarChar(10), symbol)
-    .input('amount', sql.Int, amount)
-    .input('price', sql.Decimal(18, 2), price)
-    .input('currency', sql.NVarChar(10), currency)
-    .query(`INSERT INTO dbo.Trades (account_id, security_id, quantity, total_price, trade_type, fee) 
-                VALUES (@accountId, @symbol, @amount, @price, 'BUY', 0.00)`);
-    
-    //Kommer tilbage succesfyldt til frontend
-    res.status(200).json({suceess: true, message: 'Went through'});
+      .input('accountId', sql.Int, accountId)
+      .input('securityId', sql.Int, securityId)
+      .input('amount', sql.Int, amount)
+      .input('totalPrice', sql.Decimal(18, 2), totalPrice)
+      .input('currency', sql.NVarChar(10), currency)
+      .query(`INSERT INTO dbo.Trades (account_id, security_id, quantity, total_price, trade_type, fee) 
+              VALUES (@accountId, @securityId, @amount, @totalPrice, 'BUY', 0.00)`);
 
-    } catch(error) {
-      console.error("Something went wrong trying to buy the stock", error.message);
-      res.status(500).json({succes: false, message: 'Something happent to the server'})
-    }
+    res.status(200).json({ success: true, message: 'Went through' });
 
+  } catch (error) {
+    console.error("Something went wrong trying to buy the stock", error.message);
+    res.status(500).json({ success: false, message: 'Something happened to the server' });
+  }
 });
-
-
-
 
 
 

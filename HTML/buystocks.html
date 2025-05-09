@@ -59,8 +59,7 @@
             <label for="quantity">Quantity:</label>
             <input type="number" id="quantity" min="1" placeholder="Numbers of stocks">
 
-            <label for="buy-price">The price:</label>
-            <input type="number" id="buy-price" min="1" placeholder="Price of the stock">
+           <p id="current-price">Current Price: - </p> <!-- Dette skal vise kursen-->
 
             <label for="currency">Pick currency:</label>
             <select id="currency">
@@ -81,7 +80,7 @@
         let graf;
 
         // Her definerer vi funktionen "hent"
-        window.hent = function hent() {
+            function hent() {
             const symbol = document.getElementById('symbol').value;
 
             fetch(`/api/${symbol}`)
@@ -89,6 +88,11 @@
                 .then(data => {
                     const datoer = data.map(d => d.dato);
                     const priser = data.map(d => d.pris);
+
+                    
+                    //Gemmer kursen
+                    aktuelPris = priser[priser.length - 1] //Pris fra API
+                    document.getElementById('current-price').innerText = `Current Price: ${aktuelPris} USD`;
 
                     const ctx = document.getElementById('chart').getContext('2d');
                     if (graf) graf.destroy();
@@ -132,8 +136,9 @@
         window.købAktie = function købAktie() {
             const symbol = document.getElementById('symbol').value;
             const amount = parseInt(document.getElementById('quantity').value);
-            const price = parseFloat(document.getElementById('buy-price').value);
             const currency = document.getElementById('currency').value;
+
+            const price = aktuelPris;
 
             if (!symbol || !amount || !price || price <= 0 || amount <= 0) {
                 document.getElementById('buy-message').innerText = "Ugyldige værdier";

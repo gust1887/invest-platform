@@ -1,7 +1,7 @@
 // værdipapirer.js
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const ALPHA_VANTAGE_API_KEY = 'T9RVKBMGMJ5YU5Z6'; // Din API-nøgle fra Alpha Vantage
+  const ALPHA_VANTAGE_API_KEY = 'T9RVKBMGMJ5YU5Z6'; //API-nøgle fra Alpha Vantage
 
   // Dummy-data med navn, symbol, antal aktier og samlet anskaffelsespris (krav: GAK)
   const securities = [
