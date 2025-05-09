@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,10 +17,12 @@
             max-height: 60px;
             width: auto;
             display: block;
-            margin: 0 auto 20px auto; /* centreret med luft under */
+            margin: 0 auto 20px auto;
+            /* centreret med luft under */
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -59,7 +62,7 @@
             <label for="quantity">Quantity:</label>
             <input type="number" id="quantity" min="1" placeholder="Numbers of stocks">
 
-           <p id="current-price">Current Price: - </p> <!-- Dette skal vise kursen-->
+            <p id="current-price">Current Price: - </p> <!-- Dette skal vise kursen-->
 
             <label for="currency">Pick currency:</label>
             <select id="currency">
@@ -78,66 +81,158 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         let graf;
+        let aktuelPris;
+
+        // Henter aktiedata fra localStorage hvis den findes og ikke er for gammel (24 timer)
+        function getFromCache(symbol) {
+            const key = `stockData-${symbol}`;
+            const raw = localStorage.getItem(key);
+            if (!raw) return null;
+
+            const parsed = JSON.parse(raw);
+            const maxAge = 24 * 60 * 60 * 1000; // 24 timer
+
+            if (Date.now() - parsed.timestamp < maxAge) {
+                return parsed.data;
+            }
+
+            return null;
+        }
+
+        // Gemmer aktiedata i localStorage med timestamp
+        function saveToCache(symbol, data) {
+            const key = `stockData-${symbol}`;
+            localStorage.setItem(key, JSON.stringify({
+                data,
+                timestamp: Date.now()
+            }));
+        }
+
+        // Henter nøgletal (metrics) fra localStorage hvis de findes og ikke er for gamle (ældre end 24 timer)
+        function getMetricsFromCache(symbol) {
+            const key = `metrics-${symbol}`;
+            const raw = localStorage.getItem(key);
+            if (!raw) return null;
+
+            const parsed = JSON.parse(raw);
+            const maxAge = 24 * 60 * 60 * 1000; // 24 timer
+
+            if (Date.now() - parsed.timestamp < maxAge) {
+                return parsed.data;
+            }
+
+            return null;
+        }
+
+        // Gemmer nøgletal i localStorage med timestamp
+        function saveMetricsToCache(symbol, data) {
+            const key = `metrics-${symbol}`;
+            localStorage.setItem(key, JSON.stringify({
+                data,
+                timestamp: Date.now()
+            }));
+        }
 
         // Her definerer vi funktionen "hent"
-            function hent() {
-            const symbol = document.getElementById('symbol').value;
+        function hent() {
+            const symbol = document.getElementById('symbol').value.trim().toUpperCase();
 
-            fetch(`/api/${symbol}`)
-                .then(res => res.json())
-                .then(data => {
-                    const datoer = data.map(d => d.dato);
-                    const priser = data.map(d => d.pris);
+            if (!symbol) {
+                alert("Please enter a ticker symbol");
+                return;
+            }
 
-                    
-                    //Gemmer kursen
-                    aktuelPris = priser[priser.length - 1] //Pris fra API
-                    document.getElementById('current-price').innerText = `Current Price: ${aktuelPris} USD`;
-
-                    const ctx = document.getElementById('chart').getContext('2d');
-                    if (graf) graf.destroy();
-
-                    graf = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: datoer,
-                            datasets: [{
-                                label: symbol,
-                                data: priser,
-                                borderColor: 'green'
-                            }]
+            // Aktiedata cache
+            const cachedData = getFromCache(symbol);
+            if (cachedData) {
+                console.log("Bruger cached aktiedata for", symbol);
+                visGrafOgPris(cachedData, symbol);
+            } else {
+                fetch(`/api/${symbol}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!Array.isArray(data) || data.length === 0 || !data[0].dato) {
+                            throw new Error("Invalid stock data");
                         }
+                        saveToCache(symbol, data);
+                        visGrafOgPris(data, symbol);
+                    })
+                    .catch(err => {
+                        console.error("Fejl ved aktiedata:", err);
                     });
+            }
 
-                    // Hent nøgletal
-                    return fetch(`/api/nogletal/${symbol}`);
-                })
-                .then(res => res.json())
-                .then(nogletal => {
-                    console.log("Nøgletal er modtaget:", nogletal);
-
-                    const list = document.getElementById('metrics-list');
-                    list.innerHTML = `
-                        <li><strong>P/E:</strong> ${nogletal.pe}</li>
-                        <li><strong>Volume:</strong> ${nogletal.volume}</li>
-                        <li><strong>Market Cap:</strong> ${nogletal.marketCap}</li>
-                        <li><strong>EPS:</strong> ${nogletal.eps}</li>
-                        <li><strong>Dividend in percentage (%):</strong> ${nogletal.dividendYield}</li>`;
-
-                    // Viser købsektionen
-                    document.getElementById('buy-section').style.display = 'block';
-                })
-                .catch(err => {
-                    document.getElementById('metrics-list').innerHTML = '<li>Kunne ikke hente nøgletal</li>';
-                });
+            // Nøgletal cache
+            const cachedMetrics = getMetricsFromCache(symbol);
+            if (cachedMetrics) {
+                console.log("Bruger cached nøgletal for", symbol);
+                visNøgletal(cachedMetrics);
+            } else {
+                fetch(`/api/nogletal/${symbol}`)
+                    .then(res => res.json())
+                    .then(metrics => {
+                        if (!metrics || metrics.Note || !metrics.pe) {
+                            throw new Error("API opbrugt eller ugyldig ticker");
+                        }
+                        saveMetricsToCache(symbol, metrics);
+                        visNøgletal(metrics);
+                    })
+                    .catch(err => {
+                        console.error("Fejl ved nøgletal:", err);
+                        document.getElementById('metrics-list').innerHTML = '<li>Kunne ikke hente nøgletal</li>';
+                        document.getElementById('buy-section').style.display = 'none';
+                    });
+            }
         }
+
+        
+        // Viser graf og aktuel pris i UI
+        function visGrafOgPris(data, symbol) {
+            const datoer = data.map(d => d.dato);
+            const priser = data.map(d => d.pris);
+
+            aktuelPris = priser[priser.length - 1];
+            document.getElementById('current-price').innerText = `Current Price: ${aktuelPris} USD`;
+
+            const ctx = document.getElementById('chart').getContext('2d');
+            if (graf) graf.destroy();
+
+            graf = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: datoer,
+                    datasets: [{
+                        label: symbol,
+                        data: priser,
+                        borderColor: 'green'
+                    }]
+                }
+            });
+        }
+
+
+        // Viser nøgletal i UI
+        function visNøgletal(nogletal) {
+            const list = document.getElementById('metrics-list');
+            list.innerHTML = `
+        <li><strong>P/E:</strong> ${nogletal.pe}</li>
+        <li><strong>Volume:</strong> ${nogletal.volume}</li>
+        <li><strong>Market Cap:</strong> ${nogletal.marketCap}</li>
+        <li><strong>EPS:</strong> ${nogletal.eps}</li>
+        <li><strong>Dividend in percentage (%):</strong> ${nogletal.dividendYield}</li>`;
+
+            document.getElementById('buy-section').style.display = 'block';
+        }
+
+
+
 
         // Her definerer vi funktionen "købAktie"
         window.købAktie = function købAktie() {
             const symbol = document.getElementById('symbol').value;
             const amount = parseInt(document.getElementById('quantity').value);
             const currency = document.getElementById('currency').value;
-            const accountId = sessionStorage.getItem("selectedAccountId"); 
+            const accountId = sessionStorage.getItem("selectedAccountId");
 
             const price = aktuelPris;
 
@@ -150,21 +245,22 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ symbol, amount, price, currency, accountId: parseInt(accountId)})
+                body: JSON.stringify({ symbol, amount, price, currency, accountId: parseInt(accountId) })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('buy-message').innerText = "Succesfully bought";
-                } else {
-                    document.getElementById('buy-message').innerText = data.message;
-                }
-            })
-            .catch(err => {
-                document.getElementById('buy-message').innerText = "Something went wrong";
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('buy-message').innerText = "Succesfully bought";
+                    } else {
+                        document.getElementById('buy-message').innerText = data.message;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('buy-message').innerText = "Something went wrong";
+                });
         }
     </script>
-</body>
-</html>
 
+</body>
+
+</html>

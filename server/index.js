@@ -8,7 +8,7 @@ const accountRoutes = require('./routes/accountRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 
 //API KEY 
-const API_KEY = 'RCTJI068TP44H9BP'; 
+const API_KEY = 'SPJG5Q18L7YNPKXQ'; 
 
 // Connection til SQL db 
 const { getConnection } = require('./database');
@@ -28,6 +28,8 @@ app.get('/api/:symbol', async(req,res) => {
   const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${API_KEY}`;
   const svar = await fetch(url);
   const json = await svar.json();
+
+
   const data = json['Time Series (Daily)'];
   
   // Hvis data ikke er opfyldt vil den returnere en intern data fejl (500)

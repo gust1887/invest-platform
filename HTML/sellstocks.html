@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,10 +17,12 @@
             max-height: 60px;
             width: auto;
             display: block;
-            margin: 0 auto 20px auto; /* centreret og med afstand under */
+            margin: 0 auto 20px auto;
+            /* centreret og med afstand under */
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar med navigation -->
     <div class="sidebar">
@@ -58,51 +61,136 @@
     <script>
         let graf;
 
-        // Funktion til at hente data og vise graf + nøgletal
+        // Aktiedata cache
+        function getFromCache(symbol) {
+            const key = `stockData-${symbol}`;
+            const raw = localStorage.getItem(key);
+            if (!raw) return null;
+
+            const parsed = JSON.parse(raw);
+            const maxAge = 24 * 60 * 60 * 1000;
+            if (Date.now() - parsed.timestamp < maxAge) {
+                return parsed.data;
+            }
+
+            return null;
+        }
+
+        function saveToCache(symbol, data) {
+            const key = `stockData-${symbol}`;
+            localStorage.setItem(key, JSON.stringify({
+                data,
+                timestamp: Date.now()
+            }));
+        }
+
+        // Nøgletal cache
+        function getMetricsFromCache(symbol) {
+            const key = `metrics-${symbol}`;
+            const raw = localStorage.getItem(key);
+            if (!raw) return null;
+
+            const parsed = JSON.parse(raw);
+            const maxAge = 24 * 60 * 60 * 1000;
+            if (Date.now() - parsed.timestamp < maxAge) {
+                return parsed.data;
+            }
+
+            return null;
+        }
+
+        function saveMetricsToCache(symbol, data) {
+            const key = `metrics-${symbol}`;
+            localStorage.setItem(key, JSON.stringify({
+                data,
+                timestamp: Date.now()
+            }));
+        }
+
+        // Henter og viser alt data
         function hent() {
-            const symbol = document.getElementById('symbol').value;
+            const symbol = document.getElementById('symbol').value.trim().toUpperCase();
 
-            // Først hentes kursdata til graf
-            fetch(`/api/${symbol}`)
-                .then(res => res.json())
-                .then(data => {
-                    const datoer = data.map(d => d.dato);
-                    const priser = data.map(d => d.pris);
+            if (!symbol) {
+                alert("Please enter a ticker symbol");
+                return;
+            }
 
-                    const ctx = document.getElementById('chart').getContext('2d');
-                    if (graf) graf.destroy(); // ødelæg tidligere graf hvis den findes
-
-                    graf = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: datoer,
-                            datasets: [{
-                                label: symbol,
-                                data: priser,
-                                borderColor: 'green'
-                            }]
+            // Aktiedata
+            const cachedData = getFromCache(symbol);
+            if (cachedData) {
+                console.log("Bruger cached aktiedata for", symbol);
+                visGrafOgPris(cachedData, symbol);
+            } else {
+                fetch(`/api/${symbol}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!Array.isArray(data) || data.length === 0 || !data[0].dato) {
+                            throw new Error("Invalid stock data");
                         }
+                        saveToCache(symbol, data);
+                        visGrafOgPris(data, symbol);
+                    })
+                    .catch(err => {
+                        console.error("Fejl ved aktiedata:", err);
                     });
+            }
 
-                    // Derefter hentes nøgletal
-                    return fetch(`/api/nogletal/${symbol}`);
-                })
-                .then(res => res.json())
-                .then(nogletal => {
-                    console.log("Nøgletal modtaget:", nogletal);
+            // Nøgletal
+            const cachedMetrics = getMetricsFromCache(symbol);
+            if (cachedMetrics) {
+                console.log("Bruger cached nøgletal for", symbol);
+                visNøgletal(cachedMetrics);
+            } else {
+                fetch(`/api/nogletal/${symbol}`)
+                    .then(res => res.json())
+                    .then(metrics => {
+                        if (!metrics || metrics.Note || !metrics.pe) {
+                            throw new Error("API opbrugt eller ugyldig ticker");
+                        }
+                        saveMetricsToCache(symbol, metrics);
+                        visNøgletal(metrics);
+                    })
+                    .catch(err => {
+                        console.error("Fejl ved nøgletal:", err);
+                        document.getElementById('metrics-list').innerHTML = '<li>Kunne ikke hente nøgletal</li>';
+                    });
+            }
+        }
 
-                    const list = document.getElementById('metrics-list');
-                    list.innerHTML = `
-                        <li><strong>P/E:</strong> ${nogletal.pe}</li>
-                        <li><strong>Volume:</strong> ${nogletal.volume}</li>
-                        <li><strong>Market Cap:</strong> ${nogletal.marketCap}</li>
-                        <li><strong>EPS:</strong> ${nogletal.eps}</li>
-                        <li><strong>Udbytte i procent (%):</strong> ${nogletal.dividendYield}</li>`;
-                })
-                .catch(err => {
-                    document.getElementById('metrics-list').innerHTML = '<li>Kunne ikke hente nøgletal</li>';
-                });
+        // Viser graf
+        function visGrafOgPris(data, symbol) {
+            const datoer = data.map(d => d.dato);
+            const priser = data.map(d => d.pris);
+
+            const ctx = document.getElementById('chart').getContext('2d');
+            if (graf) graf.destroy();
+
+            graf = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: datoer,
+                    datasets: [{
+                        label: symbol,
+                        data: priser,
+                        borderColor: 'red'
+                    }]
+                }
+            });
+        }
+
+        // Viser nøgletal
+        function visNøgletal(metrics) {
+            const list = document.getElementById('metrics-list');
+            list.innerHTML = `
+            <li><strong>P/E:</strong> ${metrics.pe}</li>
+            <li><strong>Volume:</strong> ${metrics.volume}</li>
+            <li><strong>Market Cap:</strong> ${metrics.marketCap}</li>
+            <li><strong>EPS:</strong> ${metrics.eps}</li>
+            <li><strong>Dividend in percentage (%):</strong> ${metrics.dividendYield}</li>`;
         }
     </script>
+
 </body>
+
 </html>
