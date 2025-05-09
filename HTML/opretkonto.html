@@ -1,59 +1,57 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
-    <!-- Henter grundlæggende design (baggrund, tekstfarve osv.) -->
+    <!-- Henter grundlæggende tema (baggrund, tekstfarve osv.) -->
     <link rel="stylesheet" href="/CSS/bittheme.css">
 
-     <!-- Fælles layout og stil til login/opret bruger -->
+    <!-- Fælles layout og stil for formularer (login / opret bruger) -->
     <link rel="stylesheet" href="/CSS/form.css">
 
-  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Opret konto</title>
-   
+    <title>Create Account</title>
 </head>
 
-
 <body>
-    <!-- Container til hele formular-indholdet -->
+    <!-- Container til hele formularens indhold -->
     <div class="form-container">
 
-        <!-- Logo øverst -->
-        <img src="/images/BIT.png" class="form-logo" alt="Logo">
+        <!-- Logo vises øverst -->
+        <img src="/HTML/images/BIT.png" class="form-logo" alt="Logo">
 
-        <!-- Selve formular-boksen -->
+        <!-- Selve boksen med formularen -->
         <div class="form-box">
-            <h2>Opret konto</h2>
-            <h5> Udfyld venligst alle oplysningerne</h5>
+            <h2>Create Account</h2>
+            <h5>Please fill in all required fields</h5>
+
             <form id="signupForm">
-                <!-- Kontonavn -->
+                <!-- Inputfelt til kontonavn -->
                 <div class="textbox">
-                    <input type="text" id="accountName" placeholder="Kontonavn" name="kontonavn" required>
+                    <input type="text" id="accountName" placeholder="Account Name" name="accountName" required>
                 </div>
 
-
-                  <!-- Valuta *ÆNDRER TIL DROPDOWN MED VALGMULIGHEDER* -->
-                  <div class="textbox">
-                    <select id="currency" name="valuta" required>
-                      <option value="">Vælg valuta</option>
-                      <option value="DKK">Danske kroner (DKK)</option>
-                      <option value="USD">Amerikanske dollars (USD)</option>
+                <!-- Valutavalg: dropdown med muligheder -->
+                <div class="textbox">
+                    <select id="currency" name="currency" required>
+                      <option value="">Select currency</option>
+                      <option value="DKK">Danish kroner (DKK)</option>
+                      <option value="USD">US dollars (USD)</option>
                       <option value="EUR">Euro (EUR)</option>
-                      <option value="GBP">Britiske pund (GBP)</option>
+                      <option value="GBP">British pounds (GBP)</option>
                     </select>
-                  </div>
-                  
+                </div>
 
-
-                <!-- Send knap -->
-                <input type="submit" value="Opret konto" class="btn-login">
+                <!-- Knap til at sende formularen -->
+                <input type="submit" value="Create Account" class="btn-login">
             </form>
         </div>
     </div>
-    <div id="signupMessage"></div>
-<script src="/JS/opretkonto.js"></script>
 
+    <!-- Besked vises her efter indsendelse -->
+    <div id="signupMessage"></div>
+
+    <!-- JavaScript som håndterer kontooprettelsen -->
+    <script src="/JS/opretkonto.js"></script>
 </body>
 </html>
 

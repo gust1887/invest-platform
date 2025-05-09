@@ -1,53 +1,53 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
-    <!-- Henter grundlæggende design (baggrund, tekstfarve osv.) -->
+    <!-- Henter grundlæggende tema (baggrund, tekstfarve osv.) -->
     <link rel="stylesheet" href="CSS/bittheme.css">
 
-  <!-- Design -->
-  <link rel="stylesheet" href="/CSS/bittheme.css" />
-  <link rel="stylesheet" href="/CSS/form.css" />
+    <!-- Fælles layout og stil for formularer -->
+    <link rel="stylesheet" href="/CSS/bittheme.css" />
+    <link rel="stylesheet" href="/CSS/form.css" />
 </head>
 
-
 <body>
-    <!-- Container til hele formular-indholdet -->
+    <!-- Container til hele formularens indhold -->
     <div class="form-container">
 
-        <!-- Logo øverst -->
-        <img src="/images/BIT.png" class="form-logo" alt="Logo">
+        <!-- Logo vises øverst -->
+        <img src="/HTML/images/BIT.png" class="form-logo" alt="Logo">
 
-        <!-- Selve formular-boksen -->
+        <!-- Formularboks -->
         <div class="form-box">
-            <h2>Opret Bruger</h2>
-            <h5> Udfyld venligst alle oplysningerne</h5>
+            <h2>Create User</h2>
+            <h5>Please fill in all required fields</h5>
+
             <form id="signupForm">
                 <!-- Brugernavn -->
                 <div class="textbox">
-                    <input type="text" id="signupUsername" placeholder="Brugernavn" name="username" required>
+                    <input type="text" id="signupUsername" placeholder="Username" name="username" required>
                 </div>
 
-
-                  <!-- e-mail -->
-                  <div class="textbox">
-                    <input type="email" id="signupEmail" placeholder="E-mail" name="email" required>
+                <!-- E-mail -->
+                <div class="textbox">
+                    <input type="email" id="signupEmail" placeholder="Email" name="email" required>
                 </div>
 
                 <!-- Adgangskode -->
                 <div class="textbox">
-                    <input type="password" id="signupPassword" placeholder="Adgangskode" name="password" required>
+                    <input type="password" id="signupPassword" placeholder="Password" name="password" required>
                 </div>
 
-                <!-- Send knap -->
-                <input type="submit" value="Opret Bruger" class="btn-login">
+                <!-- Knap til at sende formularen -->
+                <input type="submit" value="Create User" class="btn-login">
             </form>
         </div>
     </div>
-    <div id="signupMessage"></div>
-<script src="/JS/opretbruger.js"></script>
 
+    <!-- Besked vises her efter indsendelse -->
+    <div id="signupMessage"></div>
+
+    <!-- JavaScript der håndterer oprettelse -->
+    <script src="/JS/opretbruger.js"></script>
 </body>
 </html>
-
-
 

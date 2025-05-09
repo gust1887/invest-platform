@@ -4,30 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Portfolio Overview</title>
+
+  <!-- Tilføjer CSS til layout og tema -->
   <link rel="stylesheet" href="/CSS/portfolios.css">
   <link rel="stylesheet" href="/CSS/bittheme.css">
   <link rel="stylesheet" href="/CSS/userface.css">
 </head>
 <body>
 
-  <!-- Sidebar -->
+  <!-- Sidebar med navigation -->
   <div class="sidebar">
-    <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo">
+    <img src="/HTML/images/BIT.png" alt="BIT logo" class="sidebar-logo">
     <ul class="nav-links">
       <li><a href="dashboard.html">Dashboard</a></li>
       <li><a href="accounts.html">Accounts</a></li>
       <li><a href="portfolios.html" class="active">Portfolios</a></li>
     </ul>
     <div class="sidebar-bottom">
+      <!-- Skift adgangskode og log ud -->
       <button onclick="location.href='changepassword.html'">Change Password</button>
       <button onclick="location.href='logout.html'">Log Out</button>
     </div>
   </div>
 
+  <!-- Hovedindhold -->
   <div class="container">
     <h1>Portfolio Overview</h1>
 
-    <!-- Top boxes -->
+    <!-- Øverste statistikbokse -->
     <div class="top-stats">
       <div class="box">
         <h3>Total Value in DKK</h3>
@@ -42,14 +46,15 @@
         <p class="green" id="change30d">+2.4%</p>
       </div>
       <div class="box chart-box">
+        <!-- Canvas til grafen -->
         <canvas id="portfolioChart"></canvas>
       </div>
     </div>
 
-    <!-- Button to create new portfolio -->
+    <!-- Knap til at oprette ny portefølje -->
     <button id="addPortfolioBtn" class="primary-button">+ Create New Portfolio</button>
 
-    <!-- Form to create new portfolio -->
+    <!-- Formular til ny portefølje (skjult som standard) -->
     <div id="newPortfolioForm" class="form-card" style="display: none;">
       <h3>Create a New Portfolio</h3>
       <div class="form-group">
@@ -59,7 +64,7 @@
       <button id="submitNewPortfolio" class="primary-button">Add Portfolio</button>
     </div>
 
-    <!-- Portfolio Table -->
+    <!-- Tabel over eksisterende porteføljer -->
     <table>
       <thead>
         <tr>
@@ -104,7 +109,11 @@
     </table>
   </div>
 
+  <!-- Chart.js bibliotek til at vise diagram -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- JavaScript-fil til håndtering af porteføljer -->
   <script src="../JS/portfolios.js"></script>
 </body>
 </html>
+
