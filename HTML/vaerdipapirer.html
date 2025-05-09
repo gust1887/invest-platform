@@ -4,21 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Portfolio Overview</title>
+  <!-- Tilføj CSS-filer til layout og tema -->
   <link rel="stylesheet" href="/CSS/portfolios.css">
   <link rel="stylesheet" href="/CSS/bittheme.css">
   <link rel="stylesheet" href="/CSS/userface.css">
 </head>
 <body>
 
-  <!-- Sidebar -->
+  <!-- Sidepanel (Sidebar) -->
   <div class="sidebar">
-    <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo">
+    <img src="/HTML/images/BIT.png" alt="BIT logo" class="sidebar-logo">
     <ul class="nav-links">
       <li><a href="dashboard.html">Dashboard</a></li>
       <li><a href="accounts.html">Accounts</a></li>
       <li><a href="portfolios.html" class="active">Portfolios</a></li>
     </ul>
     <div class="sidebar-bottom">
+      <!-- Knapper til at skifte adgangskode og logge ud -->
       <button onclick="location.href='changepassword.html'">Change Password</button>
       <button onclick="location.href='logout.html'">Log Out</button>
     </div>
@@ -28,21 +30,21 @@
   <div class="container">
     <h1 id="portfolioHeading">Securities Overview</h1>
 
-    <!-- Øverste statistiksektion med samlet værdi og graf -->
+    <!-- Øverste sektion: samlet porteføljeværdi + cirkeldiagram -->
     <div class="top-stats">
       <div class="box">
         <h3>Total Portfolio Value</h3>
-        <!-- Dynamisk værdi opdateres af JavaScript -->
+        <!-- Dynamisk værdi indlæses via JavaScript -->
         <p style="font-size: 24px;" id="totalValueDisplay">Loading...</p>
       </div>
 
-      <!-- Sektion til cirkeldiagrammet -->
+      <!-- Cirkel-diagram via canvas -->
       <div class="box chart-box">
         <canvas id="securitiesChart" width="400" height="400"></canvas>
       </div>
     </div>
 
-    <!-- Titel + Køb/Sælg knapper -->
+    <!-- Sektion med overskrift og knapper til køb/salg -->
     <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
       <h2>Securities in Portfolio</h2>
       <div>
@@ -51,7 +53,7 @@
       </div>
     </div>
 
-    <!-- Tabel over værdipapirer -->
+    <!-- Tabel med værdipapirer -->
     <table>
       <thead>
         <tr>
@@ -64,17 +66,16 @@
         </tr>
       </thead>
       <tbody id="securitiesTableBody">
-        <!-- Rækker genereres dynamisk via JavaScript -->
+        <!-- Rækker tilføjes dynamisk via JavaScript -->
       </tbody>
     </table>
   </div>
 
-  <!-- Henter Chart.js til visning af graf -->
+  <!-- Tilføjer Chart.js bibliotek til at vise grafer -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Hoved-JavaScript til siden -->
+  <!-- Hovedscript til siden (data og funktionalitet) -->
   <script src="../JS/værdipapirer.js"></script>
 </body>
 </html>
-
 

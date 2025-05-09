@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,26 +11,26 @@
     <link rel="stylesheet" href="/CSS/userface.css">
 
     <style>
-        /* Mindre og fleksibel sidebar-logo */
+        /* Justerer sidebar-logoens størrelse og placering */
         .sidebar-logo {
             max-height: 60px;
             width: auto;
             display: block;
-            margin: 0 auto 20px auto; /* centreret med luft under */
+            margin: 0 auto 20px auto; /* centreret og med afstand under */
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
+    <!-- Sidebar med navigation -->
     <div class="sidebar">
-        <img src="/images/BIT.png" alt="BIT logo" class="sidebar-logo">
+        <img src="/HTML/images/BIT.png" alt="BIT logo" class="sidebar-logo">
         <ul class="nav-links">
             <li><a href="dashboard.html" class="active">Dashboard</a></li>
             <li><a href="accounts.html">Accounts</a></li>
             <li><a href="portfolios.html">Portfolios</a></li>
         </ul>
 
-        <!-- Knapper i bunden til log ud samt ændre adgangskode -->
+        <!-- Nederste knapper: skift kodeord / log ud -->
         <div class="sidebar-bottom">
             <button onclick="location.href='changepassword.html'">Change Password</button>
             <button onclick="location.href='logout.html'">Log Out</button>
@@ -41,28 +39,30 @@
 
     <!-- Hovedindhold -->
     <div class="main-content">
-        <!-- Søgefelt -->
+        <!-- Søgefelt og knap til at hente data -->
         <input id="symbol" placeholder="Tickersymbol">
         <button onclick="hent()">Search</button>
 
-        <!-- Graf -->
+        <!-- Graf-container -->
         <canvas id="chart" width="70%" height="50"></canvas>
 
-        <!-- Nøgletal -->
+        <!-- Visning af nøgletal -->
         <div id="key-metrics" style="margin-top: 30px;">
             <h3>Key figures</h3>
             <ul id="metrics-list"></ul>
         </div>
     </div>
 
-    <!-- Chart.js bibliotek + din eksisterende JavaScript -->
+    <!-- Chart.js bibliotek + indlejret JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         let graf;
 
+        // Funktion til at hente data og vise graf + nøgletal
         function hent() {
             const symbol = document.getElementById('symbol').value;
 
+            // Først hentes kursdata til graf
             fetch(`/api/${symbol}`)
                 .then(res => res.json())
                 .then(data => {
@@ -70,7 +70,7 @@
                     const priser = data.map(d => d.pris);
 
                     const ctx = document.getElementById('chart').getContext('2d');
-                    if (graf) graf.destroy();
+                    if (graf) graf.destroy(); // ødelæg tidligere graf hvis den findes
 
                     graf = new Chart(ctx, {
                         type: 'line',
@@ -84,6 +84,7 @@
                         }
                     });
 
+                    // Derefter hentes nøgletal
                     return fetch(`/api/nogletal/${symbol}`);
                 })
                 .then(res => res.json())
