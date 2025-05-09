@@ -15,7 +15,7 @@ const { getConnection } = require('./database');
 
 
 const app = express();
-const port = 5000;
+const port = 5001;
 
 app.use(express.json()); // Gør det muligt at læse JSON i req.body
 
@@ -69,8 +69,7 @@ app.get('/api/nogletal/:symbol', async (req, res) => {
 });
 
 app.post('/api/buy', async (req, res) => {
-  const {symbol, amount, price, currency} = req.body;
-  const accountId = 1;
+  const {symbol, amount, price, currency, accountId} = req.body;
   const totalPrice = amount * price;
 
   try {

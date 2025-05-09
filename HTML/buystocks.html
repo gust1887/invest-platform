@@ -134,9 +134,10 @@
             const amount = parseInt(document.getElementById('quantity').value);
             const price = parseFloat(document.getElementById('buy-price').value);
             const currency = document.getElementById('currency').value;
+            const accountId = sessionStorage.getItem("selectedAccountId"); 
 
-            if (!symbol || !amount || !price || price <= 0 || amount <= 0) {
-                document.getElementById('buy-message').innerText = "Ugyldige værdier";
+            if (!symbol || !amount || !price || price <= 0 || amount <= 0 || !accountId) {
+                document.getElementById('buy-message').innerText = "Ugyldige værdier eller konto mangler";
                 return;
             }
 
@@ -145,12 +146,12 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ symbol, amount, price, currency })
+                body: JSON.stringify({ symbol, amount, price, currency, accountId: parseInt(accountId)  })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById('buy-message').innerText = "Succesfull buy";
+                    document.getElementById('buy-message').innerText = "Succesful buy";
                 } else {
                     document.getElementById('buy-message').innerText = data.message;
                 }
