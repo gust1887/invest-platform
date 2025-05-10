@@ -132,7 +132,7 @@ app.post('/api/buy', async (req, res) => {
       .input('totalPrice', sql.Decimal(18, 2), totalPrice)
       .input('currency', sql.NVarChar(10), currency)
       .query(`INSERT INTO dbo.Trades (account_id, security_id, quantity, total_price, trade_type, fee) 
-              VALUES (@accountId, @securityId, @amount, @totalPrice, 'BUY', 0.00)`);
+              VALUES (@accountId, @securityId, @amount, @totalPrice, 'BUY', 39.00)`);
 
     res.status(200).json({ success: true, message: 'It went thruogh' });
 

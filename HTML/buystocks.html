@@ -62,7 +62,7 @@
             <label for="quantity">Quantity:</label>
             <input type="number" id="quantity" min="1" placeholder="Numbers of stocks">
 
-            <p id="current-price">Current Price: - </p> <!-- Dette skal vise kursen-->
+            <p id="current-price">Current Price:</p> <!--Kursen-->
 
             <label for="currency">Pick currency:</label>
             <select id="currency">
@@ -237,7 +237,7 @@
             const price = aktuelPris;
 
             if (!symbol || !amount || !price || price <= 0 || amount <= 0) {
-                document.getElementById('buy-message').innerText = "Ugyldige værdier";
+                document.getElementById('buy-message').innerText = "Not valid number";
             }
 
             fetch('/api/buy', {

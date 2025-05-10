@@ -39,7 +39,7 @@ async function getAndShowPortfolios() {
 
   // Hvis der ikke er valgt konto, vis advarsel
   if (!accountId) {
-    console.warn("❗ Ingen konto valgt – kan ikke hente porteføljer");
+    console.warn("Ingen konto valgt – kan ikke hente porteføljer");
     return;
   }
 
