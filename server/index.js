@@ -21,19 +21,18 @@ const port = 5001;
 app.use(express.json()); // Gør det muligt at læse JSON i req.body
 
 
-//Henter aktiedata fra en API
+//Henter aktiedata fra Alpha Vantage 
 
 app.get('/api/:symbol', async(req,res) => {
   const symbol = req.params.symbol;
   const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${API_KEY}`;
+  
   const svar = await fetch(url);
   const json = await svar.json();
-
-
   const data = json['Time Series (Daily)'];
   
   // Hvis data ikke er opfyldt vil den returnere en intern data fejl (500)
-  if(!data) return res.status(500).json({error: 'Data ikke fundet eller forkert navn'});
+  if(!data) return res.status(500).json({error: 'Data could not be found or wrong'});
 
   const resultat = Object.entries(data)
   .slice(0,7)
@@ -45,6 +44,8 @@ app.get('/api/:symbol', async(req,res) => {
   res.json(resultat);
 });
 
+// Henter nøgeltal fra Alpha Vantage 
+
 app.get('/api/nogletal/:symbol', async (req, res) => {
   const symbol = req.params.symbol;
   const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${API_KEY}`;
@@ -54,7 +55,7 @@ app.get('/api/nogletal/:symbol', async (req, res) => {
     const json = await svar.json();
 
     if (!json || !json.Symbol) {
-      return res.status(500).json({ error: 'Ingen nøgletal fundet' });
+      return res.status(500).json({ error: 'No key figures could be found' });
     }
 
     const data = {
@@ -67,9 +68,11 @@ app.get('/api/nogletal/:symbol', async (req, res) => {
 
     res.json(data);
   } catch (err) {
-    res.status(500).json({ error: 'Fejl ved hentning af nøgletal' });
+    res.status(500).json({ error: 'Fail getting the key figures' });
   }
 });
+
+//Henter det valgte mængde og prisen på købet ind i databasen
 
 app.post('/api/buy', async (req, res) => {
   const {symbol, amount, price, currency, accountId} = req.body;

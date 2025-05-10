@@ -9,7 +9,7 @@ router.post('/', async (req, res) => {
     const { portfolioName, account_id, user_id } = req.body;
 
     if (!account_id || !portfolioName) {
-        return res.status(400).json({ error: 'Mangler data' });
+        return res.status(400).json({ error: 'Data is missing' });
     }
 
     try {
@@ -23,10 +23,10 @@ router.post('/', async (req, res) => {
           VALUES (@portfolioName, @account_id, @user_id)
         `);
 
-        res.status(201).json({ message: 'Portefølje oprettet' });
+        res.status(201).json({ message: 'Portofole created' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Fejl ved oprettelse af portefølje' });
+        res.status(500).json({ error: 'Fail to create the portofole' });
     }
 });
 
@@ -42,8 +42,8 @@ router.get('/konto/:accountId', async (req, res) => {
   
       res.status(200).json(result.recordset);
     } catch (err) {
-      console.error('Fejl ved hentning af porteføljer:', err);
-      res.status(500).json({ error: 'Serverfejl ved hentning' });
+      console.error('Server fail to get:', err);
+      res.status(500).json({ error: 'Server fail to get' });
     }
   });
   
