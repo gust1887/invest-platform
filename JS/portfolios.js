@@ -26,47 +26,82 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 
-const portfolioTableBody = document.getElementById("portfolioTableBody");
+  const portfolioTableBody = document.getElementById("portfolioTableBody");
 
-// Kør ved page load
-getAndShowPortfolios();
+  // Kør ved page load
+  getAndShowPortfolios();
 
 
 
-// Henter og viser porteføljer for den valgte konto
-async function getAndShowPortfolios() {
-  const accountId = sessionStorage.getItem("selectedAccountId");
+  // Henter og viser porteføljer for den valgte konto
+  async function getAndShowPortfolios() {
+    const accountId = sessionStorage.getItem("selectedAccountId");
 
-  // Hvis der ikke er valgt konto, vis advarsel
-  if (!accountId) {
-    console.warn("Ingen konto valgt – kan ikke hente porteføljer");
-    return;
+    // Hvis der ikke er valgt konto, vis advarsel
+    if (!accountId) {
+      console.warn("Ingen konto valgt – kan ikke hente porteføljer");
+      return;
+    }
+
+    try {
+      // Hent porteføljer fra serveren for den specifikke konto
+      const res = await fetch(`/api/portfolios/summary/${accountId}`);
+      const portfolios = await res.json();
+
+      // Slet eksisterende rows (fx placeholder testdata)
+      portfolioTableBody.innerHTML = "";
+
+      // Tilføj hver portefølje som en række i tabellen
+      portfolios.forEach((p) => {
+        const row = document.createElement("tr");
+
+        const link = document.createElement("a");
+        link.href = "#";
+        link.textContent = p.portfolioName;
+        link.classList.add("portfolio-link");
+
+        link.addEventListener("click", function (e) {
+          e.preventDefault();
+          sessionStorage.setItem("selectedPortfolioId", p.id);
+          window.location.href = "vaerdipapirer.html";
+        });
+
+        const nameCell = document.createElement("td");
+        nameCell.appendChild(link);
+
+        const changeCell = document.createElement("td");
+        changeCell.classList.add("green");
+        changeCell.textContent = "+0.00%";
+
+        const dateCell = document.createElement("td");
+        dateCell.textContent = p.lastTrade
+          ? new Date(p.lastTrade).toLocaleString("da-DK")
+          : "--/--/----";
+
+        const valueCell = document.createElement("td");
+        valueCell.textContent = p.totalValue ? `${p.totalValue.toFixed(2)} DKK` : "0 DKK";
+
+        row.appendChild(nameCell);
+        row.appendChild(changeCell);
+        row.appendChild(dateCell);
+        row.appendChild(valueCell);
+
+        portfolioTableBody.appendChild(row);
+      });
+    } catch (err) {
+      console.error("Fejl ved hentning af porteføljer:", err);
+    }
   }
 
-  try {
-    // Hent porteføljer fra serveren for den specifikke konto
-    const res = await fetch(`/api/portfolios/konto/${accountId}`);
-    const portfolios = await res.json();
-
-    // Slet eksisterende rows (fx hardkodede testdata)
-    portfolioTableBody.innerHTML = "";
-
-    // Tilføj hver portefølje som en række i tabellen
-    portfolios.forEach((p) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td><a href="vaerdipapirer.html?portfolio=${encodeURIComponent(p.portfolioName)}">${p.portfolioName}</a></td>
-        <td class="green">+0.00%</td>
-        <td>--/--/----</td>
-        <td>0 DKK</td>
-      `;
-      portfolioTableBody.appendChild(row);
+  // Tilføj klik-handlere som sætter portfolioId i sessionStorage
+  document.querySelectorAll('.portfolio-link').forEach(link => {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      const id = this.getAttribute("data-id");
+      sessionStorage.setItem("selectedPortfolioId", id);
+      window.location.href = "vaerdipapirer.html";
     });
-  } catch (err) {
-    console.error("Fejl ved hentning af porteføljer:", err);
-  }
-}
-
+  });
 
 
 

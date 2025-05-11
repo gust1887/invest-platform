@@ -185,7 +185,7 @@
             }
         }
 
-        
+
         // Viser graf og aktuel pris i UI
         function visGrafOgPris(data, symbol) {
             const datoer = data.map(d => d.dato);
@@ -233,6 +233,7 @@
             const amount = parseInt(document.getElementById('quantity').value);
             const currency = document.getElementById('currency').value;
             const accountId = sessionStorage.getItem("selectedAccountId");
+            const portfolioId = sessionStorage.getItem("selectedPortfolioId");
 
             const price = aktuelPris;
 
@@ -245,7 +246,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ symbol, amount, price, currency, accountId: parseInt(accountId) })
+                body: JSON.stringify({ symbol, amount, price, currency, accountId: parseInt(accountId), portfolioId: parseInt(portfolioId) })
             })
                 .then(res => res.json())
                 .then(data => {

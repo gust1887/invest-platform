@@ -44,7 +44,7 @@ app.get('/api/:symbol', async(req,res) => {
   res.json(resultat);
 });
 
-// Henter nøgeltal fra Alpha Vantage 
+// Henter nøgletal fra Alpha Vantage 
 
 app.get('/api/nogletal/:symbol', async (req, res) => {
   const symbol = req.params.symbol;
@@ -73,76 +73,148 @@ app.get('/api/nogletal/:symbol', async (req, res) => {
 });
 
 //Henter det valgte mængde og prisen på købet ind i databasen
-
 app.post('/api/buy', async (req, res) => {
-  const {symbol, amount, price, currency, accountId} = req.body;
-  const totalPrice = amount * price;
+  const { symbol, amount, price, currency, accountId, portfolioId } = req.body;
+
+  const totalPrice = price * amount;
 
   try {
-    // Forbinder til databasen
-    const connection = await getConnection();
-    
-
-    // Der søges i dbo.Securities for at finde ID på baggrund af ticker
-    let securityResult = await connection.request()
-      .input('ticker', sql.NVarChar(10), symbol)
-      .query('SELECT id FROM dbo.Securities WHERE ticker = @ticker');
+    const pool = await getConnection();
 
 
-    // Hvis aktien ikke findes, opretter vi den
-    if (securityResult.recordset.length === 0) {
-      const insertResult = await connection.request()
-        .input('ticker', sql.NVarChar(10), symbol)
-        .input('name', sql.NVarChar(50), symbol)
-        .input('market', sql.NVarChar(10), 'Unknown') 
-        .input('currency', sql.NVarChar(10), currency)
-        .query('INSERT INTO dbo.Securities (ticker, name, market, currency) OUTPUT INSERTED.id VALUES (@ticker, @name, @market, @currency)');
+    //  Find eller opret security
+    let secResult = await pool.request()
+      .input('ticker', sql.NVarChar, symbol)
+      .query('SELECT id FROM Securities WHERE ticker = @ticker');
 
-      securityResult = insertResult;
-      console.log("Aktie oprettet med ID:", securityResult.recordset[0].id);
+    let securityId;
+    if (secResult.recordset.length === 0) {
+      const insertSec = await pool.request()
+        .input('securitiesName', sql.NVarChar, symbol) // evt. bedre navn senere
+        .input('ticker', sql.NVarChar, symbol)
+        .input('securityType', sql.NVarChar, 'Stock')
+        .query(`
+          INSERT INTO Securities (securitiesName, ticker, securityType)
+          OUTPUT INSERTED.id
+          VALUES (@securitiesName, @ticker, @securityType)
+        `);
+      securityId = insertSec.recordset[0].id;
+    } else {
+      securityId = secResult.recordset[0].id;
     }
 
-    // Henter det korrekte ID
-    const securityId = securityResult.recordset[0].id;
-
-    // Henter brugerens balance
-    const result = await connection.request()
+    // Tjek saldo
+    const balanceCheck = await pool.request()
       .input('accountId', sql.Int, accountId)
-      .query('SELECT balance FROM dbo.Accounts WHERE id = @accountId');
+      .query('SELECT balance FROM Accounts WHERE id = @accountId');
 
-    if (result.recordset.length === 0) {
-      return res.status(404).json({ success: false, message: 'Account couldnt be found' });
+    const currentBalance = balanceCheck.recordset[0].balance;
+    if (currentBalance < totalPrice) {
+      return res.status(400).json({ success: false, message: "Insufficient funds." });
     }
 
-    const balance = result.recordset[0].balance;
-
-    // Tjekker om der er penge nok
-    if (balance < totalPrice) {
-      return res.status(404).json({ success: false, message: 'Not enough money in the account' });
-    }
-
-    // Trækker beløbet fra kontoen
-    await connection.request()
-      .input('totalPrice', sql.Decimal(18, 2), totalPrice)
-      .input('accountId', sql.Int, accountId)
-      .query('UPDATE dbo.Accounts SET balance = balance - @totalPrice WHERE id = @accountId');
-
-    // Indsætter i dbo.Trades
-    await connection.request()
+    //  Indsæt trade
+    await pool.request()
+      .input('portfolioId', sql.Int, portfolioId)
       .input('accountId', sql.Int, accountId)
       .input('securityId', sql.Int, securityId)
       .input('amount', sql.Int, amount)
       .input('totalPrice', sql.Decimal(18, 2), totalPrice)
-      .input('currency', sql.NVarChar(10), currency)
-      .query(`INSERT INTO dbo.Trades (account_id, security_id, quantity, total_price, trade_type, fee) 
-              VALUES (@accountId, @securityId, @amount, @totalPrice, 'BUY', 39.00)`);
+      .input('fee', sql.Decimal(18, 2), 0)
+      .input('type', sql.NVarChar, 'BUY')
+      .query(`
+        INSERT INTO Trades (portfolio_id, account_id, security_id, quantity, total_price, fee, trade_type)
+        VALUES (@portfolioId, @accountId, @securityId, @amount, @totalPrice, @fee, @type)
+      `);
 
-    res.status(200).json({ success: true, message: 'It went thruogh' });
+    //  Træk pengene fra konto
+    await pool.request()
+      .input('amount', sql.Decimal(18, 2), totalPrice)
+      .input('accountId', sql.Int, accountId)
+      .query(`
+        UPDATE Accounts
+        SET balance = balance - @amount
+        WHERE id = @accountId
+      `);
 
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Something happened to the server' });
+    return res.json({ success: true, message: "Trade successful" });
+
+  } catch (err) {
+    console.error("Fejl ved køb:", err);
+    res.status(500).json({ success: false, message: "Server error during trade" });
   }
 });
+
+
+
+app.post('/api/sell', async (req, res) => {
+  const { symbol, amount, price, currency, accountId, portfolioId } = req.body;
+
+  const totalPrice = price * amount;
+
+  try {
+    const pool = await getConnection();
+
+    // Find security
+    const secResult = await pool.request()
+      .input('ticker', sql.NVarChar, symbol)
+      .query('SELECT id FROM Securities WHERE ticker = @ticker');
+
+    if (secResult.recordset.length === 0) {
+      return res.status(400).json({ success: false, message: "Stock not found in database" });
+    }
+
+    const securityId = secResult.recordset[0].id;
+
+    // Tjek beholdning
+    const holdings = await pool.request()
+      .input('portfolioId', sql.Int, portfolioId)
+      .input('securityId', sql.Int, securityId)
+      .query(`
+        SELECT 
+          SUM(CASE WHEN trade_type = 'BUY' THEN quantity ELSE -quantity END) AS total
+        FROM Trades
+        WHERE portfolio_id = @portfolioId AND security_id = @securityId
+      `);
+
+    const owned = holdings.recordset[0].total || 0;
+
+    if (owned < amount) {
+      return res.status(400).json({ success: false, message: "Not enough shares to sell" });
+    }
+
+    //  Indsæt trade
+    await pool.request()
+      .input('portfolioId', sql.Int, portfolioId)
+      .input('accountId', sql.Int, accountId)
+      .input('securityId', sql.Int, securityId)
+      .input('amount', sql.Int, amount)
+      .input('totalPrice', sql.Decimal(18, 2), totalPrice)
+      .input('fee', sql.Decimal(18, 2), 0)
+      .input('type', sql.NVarChar, 'SELL')
+      .query(`
+        INSERT INTO Trades (portfolio_id, account_id, security_id, quantity, total_price, fee, trade_type)
+        VALUES (@portfolioId, @accountId, @securityId, @amount, @totalPrice, @fee, @type)
+      `);
+
+    // Opdater balance
+    await pool.request()
+      .input('amount', sql.Decimal(18, 2), totalPrice)
+      .input('accountId', sql.Int, accountId)
+      .query(`
+        UPDATE Accounts
+        SET balance = balance + @amount
+        WHERE id = @accountId
+      `);
+
+    res.json({ success: true, message: "Sale completed" });
+
+  } catch (err) {
+    console.error("Fejl ved salg:", err);
+    res.status(500).json({ success: false, message: "Server error during sale" });
+  }
+});
+
 
 
 
