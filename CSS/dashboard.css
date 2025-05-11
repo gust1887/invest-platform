@@ -48,12 +48,12 @@ h1 {
 .bottom-boxes {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 0;
   margin-bottom: 3rem;
 }
 
 .table-box {
-  flex: 1;
+  flex: 1 1 100%;
   background-color: #1c1c1c;
   padding: 1.5rem;
   border-radius: 10px;

@@ -131,4 +131,113 @@ GROUP BY Portfolios.id, Portfolios.portfolioName
 });
 
 
+// Udregn urealiseret gevinst
+router.get('/unrealized/:accountId', async (req, res) => {
+  const accountId = req.params.accountId;
+
+  try {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input("accountId", sql.Int, accountId)
+      .query(`
+        SELECT 
+          Securities.ticker,
+          Securities.securitiesName,
+          SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE -Trades.quantity END) AS totalQuantity,
+          SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.total_price ELSE 0 END) AS totalBuyCost,
+          SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE 0 END) AS totalBoughtQty,
+          MAX(Trades.total_price / NULLIF(Trades.quantity, 0)) AS latestPrice
+        FROM Trades
+        JOIN Securities ON Securities.id = Trades.security_id
+        JOIN Portfolios ON Portfolios.id = Trades.portfolio_id
+        WHERE Portfolios.account_id = @accountId
+        GROUP BY Securities.ticker, Securities.securitiesName
+        HAVING SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE -Trades.quantity END) > 0
+      `);
+
+    const data = result.recordset.map(row => {
+      const avgBuyPrice = row.totalBoughtQty > 0 ? row.totalBuyCost / row.totalBoughtQty : 0;
+      const currentValue = row.totalQuantity * row.latestPrice;
+      const costBasis = row.totalQuantity * avgBuyPrice;
+      const unrealizedGain = currentValue - costBasis;
+
+      return {
+        ticker: row.ticker,
+        name: row.securitiesName,
+        quantity: row.totalQuantity,
+        currentPrice: row.latestPrice,
+        avgBuyPrice: avgBuyPrice,
+        unrealizedGain: unrealizedGain
+      };
+    });
+
+    const totalUnrealized = data.reduce((sum, s) => sum + s.unrealizedGain, 0);
+
+    res.json({ total: totalUnrealized, details: data });
+  } catch (err) {
+    console.error("Fejl ved beregning af urealiseret gevinst:", err);
+    res.status(500).json({ error: "Serverfejl" });
+  }
+});
+
+
+//  Udregn realiseret gevinst
+router.get('/realized/:accountId', async (req, res) => {
+  const accountId = req.params.accountId;
+
+  try {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input("accountId", sql.Int, accountId)
+      .query(`
+        WITH BuyData AS (
+          SELECT 
+            Securities.id AS securityId,
+            Securities.ticker,
+            SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.total_price ELSE 0 END) AS totalBuyCost,
+            SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE 0 END) AS totalBoughtQty
+          FROM Trades
+          JOIN Securities ON Securities.id = Trades.security_id
+          JOIN Portfolios ON Portfolios.id = Trades.portfolio_id
+          WHERE Portfolios.account_id = @accountId
+          GROUP BY Securities.id, Securities.ticker
+        ),
+        SellData AS (
+          SELECT 
+            Securities.id AS securityId,
+            Securities.ticker,
+            SUM(CASE WHEN Trades.trade_type = 'SELL' THEN Trades.total_price ELSE 0 END) AS totalSellValue,
+            SUM(CASE WHEN Trades.trade_type = 'SELL' THEN Trades.quantity ELSE 0 END) AS totalSoldQty
+          FROM Trades
+          JOIN Securities ON Securities.id = Trades.security_id
+          JOIN Portfolios ON Portfolios.id = Trades.portfolio_id
+          WHERE Portfolios.account_id = @accountId
+          GROUP BY Securities.id, Securities.ticker
+        )
+        SELECT 
+          BuyData.ticker,
+          BuyData.totalBoughtQty,
+          SellData.totalSoldQty,
+          BuyData.totalBuyCost,
+          SellData.totalSellValue,
+          (
+            SellData.totalSellValue - 
+            (SellData.totalSoldQty * (BuyData.totalBuyCost / NULLIF(BuyData.totalBoughtQty, 0)))
+          ) AS realizedGain
+        FROM BuyData
+        JOIN SellData ON SellData.securityId = BuyData.securityId
+        WHERE SellData.totalSoldQty > 0
+      `);
+
+    const totalRealized = result.recordset.reduce((sum, s) => sum + (s.realizedGain || 0), 0);
+    res.json({ total: totalRealized, details: result.recordset });
+  } catch (err) {
+    console.error("Fejl ved beregning af realiseret gevinst:", err);
+    res.status(500).json({ error: "Serverfejl" });
+  }
+});
+
+
+
+
 module.exports = router;
