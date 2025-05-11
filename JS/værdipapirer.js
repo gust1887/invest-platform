@@ -108,3 +108,32 @@ function getCachedPrice(symbol) {
 
   return null;
 }
+
+// Kalder API og opdaterer alle aktiekurser i den valgte portefølje (fra API og gemmer i localStorage)
+async function opdaterAlleKurser() {
+  const portfolioId = sessionStorage.getItem("selectedPortfolioId");
+
+  if (!portfolioId) {
+    alert("No portfolio selected");
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/portfolios/${portfolioId}/securities`);
+    const securities = await res.json();
+
+    for (const sec of securities) {
+      const response = await fetch(`/api/${sec.ticker}`);
+      const data = await response.json();
+
+      // Gemmer ny kursdata i localStorage
+      saveToCache(sec.ticker, data);
+    }
+
+    alert("Shares have been updated - Refreshing site");
+    location.reload();
+  } catch (err) {
+    console.error("Error when refreshing shares:", err);
+    alert("Could not update shares.");
+  }
+}
