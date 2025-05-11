@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
         link.addEventListener("click", function (e) {
           e.preventDefault();
           sessionStorage.setItem("selectedPortfolioId", p.id);
+          sessionStorage.setItem("selectedPortfolioName", p.portfolioName);
           window.location.href = "vaerdipapirer.html";
         });
 
@@ -79,7 +80,9 @@ document.addEventListener("DOMContentLoaded", () => {
           : "--/--/----";
 
         const valueCell = document.createElement("td");
-        valueCell.textContent = p.totalValue ? `${p.totalValue.toFixed(2)} DKK` : "0 DKK";
+        // Henter valuta fra sessionStorage
+        const currency = sessionStorage.getItem("accountCurrency") || "DKK";
+        valueCell.textContent = p.totalValue ? `${p.totalValue.toFixed(2)} ${currency}` : `0 ${currency}`;
 
         row.appendChild(nameCell);
         row.appendChild(changeCell);
@@ -93,15 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Tilføj klik-handlere som sætter portfolioId i sessionStorage
-  document.querySelectorAll('.portfolio-link').forEach(link => {
-    link.addEventListener("click", function (e) {
-      e.preventDefault();
-      const id = this.getAttribute("data-id");
-      sessionStorage.setItem("selectedPortfolioId", id);
-      window.location.href = "vaerdipapirer.html";
-    });
-  });
 
 
 
@@ -172,23 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-
-  // Make existing names clickable
-  const rows = portfolioTableBody.getElementsByTagName("tr");
-  for (let row of rows) {
-    const cell = row.cells[0];
-    const name = cell.textContent.trim();
-
-    const link = document.createElement("a");
-    link.href = `vaerdipapirer.html?portfolio=${encodeURIComponent(name)}`;
-    link.textContent = name;
-    link.style.textDecoration = "none";
-    link.style.color = "inherit";
-
-    cell.textContent = "";
-    cell.appendChild(link);
-  }
 });
 
 
-//Skal sættes op med SQL og ALPA API for at få reelle tal ind. 

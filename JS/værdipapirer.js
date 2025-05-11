@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const portfolioId = sessionStorage.getItem("selectedPortfolioId");
 
+  const name = sessionStorage.getItem("selectedPortfolioName");
+  document.getElementById("portfolioHeading").innerText = name ? `Securities in ${name}` : "Securities Overview";
+
   if (!portfolioId) {
     alert("Ingen portefølje valgt.");
     return;
@@ -17,6 +20,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const chartData = [];
     let totalValue = 0;
 
+    // Hent valuta fra sessionStorage og Opdater total værdi
+    const currency = sessionStorage.getItem("accountCurrency") || "USD";
+    document.getElementById("totalValueDisplay").innerText = `${totalValue.toFixed(2)} ${currency}`;
+
+
     securities.forEach(security => {
       const cached = getCachedPrice(security.ticker);
       const currentPrice = Number.isFinite(cached) ? cached : 100;
@@ -31,8 +39,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <td>${security.securitiesName}</td>
                 <td>${security.ticker}</td>
                 <td>${security.totalQuantity}</td>
-                <td>${currentPrice.toFixed(2)} USD</td>
-                <td>${total.toFixed(2)} USD</td>
+                <td>${currentPrice.toFixed(2)} ${currency}</td>
+                <td>${total.toFixed(2)} ${currency}</td>
                 <td>${change24h}</td>
             `;
       tbody.appendChild(row);
@@ -41,8 +49,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       chartData.push(total);
     });
 
-    // Opdater total værdi
-    document.getElementById("totalValueDisplay").innerText = `${totalValue.toFixed(2)} USD`;
 
     // Tegn donut chart
     const ctx = document.getElementById("securitiesChart").getContext("2d");

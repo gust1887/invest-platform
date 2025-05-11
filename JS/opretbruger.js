@@ -1,8 +1,3 @@
-// Fortsæt fra tidligere users-array
-const users = [
-  { username: 'testbruger', password: 'tester1234', email: 'test@example.com' },
-  { username: 'admin', password: 'admin123', email: 'admin@example.com' }
-];
 
 // Lyt efter submit på opret-bruger formular
 document.getElementById('signupForm').addEventListener('submit', async function (e) {
@@ -66,6 +61,5 @@ document.getElementById('signupForm').addEventListener('submit', async function 
     console.error(err);
     document.getElementById('signupMessage').innerText = 'Netværksfejl.';
   }
-  // Du kan evt. omdirigere: window.location.href = 'login.html';
 });
 

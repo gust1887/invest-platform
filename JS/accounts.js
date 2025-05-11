@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 sessionStorage.setItem('selectedAccountId', account.id);
+                sessionStorage.setItem('accountCurrency', account.currency);
                 alert(`Konto "${account.accountName}" er valgt.`);
                 location.reload(); // Genindlæs for at vise markering
             });
