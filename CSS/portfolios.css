@@ -29,10 +29,13 @@ h1 {
 }
 
 /* Specifik stil for diagram-boksen */
-.chart-box {
-  max-width: 400px;
-}
-
+  .chart-box canvas {
+    width: 100%;
+    max-width: 350px;
+    height: 300px;
+    display: block;
+    margin: auto;
+  }
 /* Grøn/rød tekst til visning af ændringer */
 .green {
   color: #4caf50;

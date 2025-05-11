@@ -20,9 +20,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const chartData = [];
     let totalValue = 0;
 
-    // Hent valuta fra sessionStorage og Opdater total værdi
+    // Hent valuta fra sessionStorage 
     const currency = sessionStorage.getItem("accountCurrency") || "USD";
-    document.getElementById("totalValueDisplay").innerText = `${totalValue.toFixed(2)} ${currency}`;
 
 
     securities.forEach(security => {
@@ -48,6 +47,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       labels.push(security.ticker);
       chartData.push(total);
     });
+
+    // Opdaterer total portfølje værdi
+    const totalVal = document.getElementById("totalValueDisplay");
+    totalVal.innerText = `${totalValue.toFixed(2)} ${currency}`;
+    // Grøn farve for positiv værdi
+    totalVal.style.color = totalValue > 0 ? "#4caf50" : "white";
 
 
     // Tegn donut chart

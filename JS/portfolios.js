@@ -1,29 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Donut chart
-  const ctx = document.getElementById("portfolioChart").getContext("2d");
-  new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: ["Growth Tech", "Tech Leaders", "ETF", "Space & Defence", "E-com"],
-      datasets: [{
-        data: [35201, 11000, 7584, 6842, 6500],
-        backgroundColor: [
-          "#ffc107", "#2196f3", "#4caf50", "#9c27b0", "#ff5722"
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      plugins: {
-        legend: {
-          position: 'right',
-          labels: {
-            color: 'white'
-          }
-        }
-      }
-    }
-  });
+
 
 
   const portfolioTableBody = document.getElementById("portfolioTableBody");
@@ -37,29 +13,39 @@ document.addEventListener("DOMContentLoaded", () => {
   async function getAndShowPortfolios() {
     const accountId = sessionStorage.getItem("selectedAccountId");
 
-    // Hvis der ikke er valgt konto, vis advarsel
     if (!accountId) {
-      console.warn("Ingen konto valgt – kan ikke hente porteføljer");
+      console.warn("No account chosen – Cannot get portfolios");
       return;
     }
 
     try {
-      // Hent porteføljer fra serveren for den specifikke konto
       const res = await fetch(`/api/portfolios/summary/${accountId}`);
       const portfolios = await res.json();
 
-      // Slet eksisterende rows (fx placeholder testdata)
+      // Ryd eksisterende tabelindhold
       portfolioTableBody.innerHTML = "";
 
-      // Tilføj hver portefølje som en række i tabellen
+      const currency = sessionStorage.getItem("accountCurrency") || "DKK";
+      const totalValueEl = document.getElementById("totalValue");
+
+      let samletVærdi = 0; // Akkumuleret værdi for alle porteføljer
+      const labels = [];   // Navne til donut chart
+      const values = [];   // Værdier til donut chart
+
       portfolios.forEach((p) => {
+        samletVærdi += p.totalValue || 0;
+        labels.push(p.portfolioName);
+        values.push(p.totalValue || 0);
+
         const row = document.createElement("tr");
 
+        // Opret klikbart link til portefølje
         const link = document.createElement("a");
         link.href = "#";
         link.textContent = p.portfolioName;
         link.classList.add("portfolio-link");
 
+        // Når man klikker på porteføljen, gem ID og navn i sessionStorage
         link.addEventListener("click", function (e) {
           e.preventDefault();
           sessionStorage.setItem("selectedPortfolioId", p.id);
@@ -67,12 +53,13 @@ document.addEventListener("DOMContentLoaded", () => {
           window.location.href = "vaerdipapirer.html";
         });
 
+        // Sæt op celler til rækken
         const nameCell = document.createElement("td");
         nameCell.appendChild(link);
 
         const changeCell = document.createElement("td");
         changeCell.classList.add("green");
-        changeCell.textContent = "+0.00%";
+        changeCell.textContent = "+0.00%"; // Placeholder
 
         const dateCell = document.createElement("td");
         dateCell.textContent = p.lastTrade
@@ -80,21 +67,32 @@ document.addEventListener("DOMContentLoaded", () => {
           : "--/--/----";
 
         const valueCell = document.createElement("td");
-        // Henter valuta fra sessionStorage
-        const currency = sessionStorage.getItem("accountCurrency") || "DKK";
-        valueCell.textContent = p.totalValue ? `${p.totalValue.toFixed(2)} ${currency}` : `0 ${currency}`;
+        valueCell.textContent = p.totalValue
+          ? `${p.totalValue.toFixed(2)} ${currency}`
+          : `0 ${currency}`;
 
+        // Tilføj alle celler til rækken
         row.appendChild(nameCell);
         row.appendChild(changeCell);
         row.appendChild(dateCell);
         row.appendChild(valueCell);
 
+        // Tilføj rækken til tabellen
         portfolioTableBody.appendChild(row);
       });
+
+      // Opdater feltet med samlet værdi i boksen
+      totalValueEl.textContent = `${samletVærdi.toFixed(2)} ${currency}`;
+
+      // Opdater donut-grafen med nye data
+      setTimeout(() => {
+        updateDonutChart(labels, values, currency);
+      }, 100);
     } catch (err) {
       console.error("Fejl ved hentning af porteføljer:", err);
     }
   }
+
 
 
 
@@ -165,6 +163,47 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Udfyld venligst alle felter.");
     }
   });
+
+
+  function updateDonutChart(labels, values, currency) {
+    const ctx = document.getElementById("portfolioChart").getContext("2d");
+
+    // Slet tidligere graf hvis den findes
+    if (window.portfolioChart && typeof window.portfolioChart.destroy === "function") {
+      window.portfolioChart.destroy();
+    }
+
+    window.portfolioChart = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: [
+            "#ffc107", "#2196f3", "#4caf50", "#9c27b0", "#ff5722"
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        plugins: {
+          legend: {
+            position: "right",
+            labels: {
+              color: "white"
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                return `${context.label}: ${context.raw.toFixed(2)} ${currency}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
 
 });
 
