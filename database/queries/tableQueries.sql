@@ -55,14 +55,14 @@ CREATE TABLE Trades (
     FOREIGN KEY (security_id) REFERENCES Securities(id),
     FOREIGN KEY (account_id) REFERENCES Accounts(id)
 );
+    
 
--- Konto Transaktioner
-CREATE TABLE AccountTransactions (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    account_id INT NOT NULL,
-    amount DECIMAL(18,2) NOT NULL,
-    currency NVARCHAR(10) NOT NULL,
-    transaction_type NVARCHAR(10) NOT NULL, -- 'deposit' eller 'withdraw'
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (account_id) REFERENCES Accounts(id)
+-- Til at holde styr på udvikling af portfølje værdi over tid
+CREATE TABLE PortfolioHistory (
+  id INT PRIMARY KEY IDENTITY(1,1),
+  portfolio_id INT NOT NULL,
+  value DECIMAL(18,2) NOT NULL,
+  currency NVARCHAR(10),
+  recorded_at DATETIME DEFAULT GETDATE(),
+  FOREIGN KEY (portfolio_id) REFERENCES Portfolios(id)
 );

@@ -43,7 +43,7 @@ router.get('/konto/:accountId', async (req, res) => {
     res.status(200).json(result.recordset);
   } catch (err) {
     console.error('Server fail to get:', err);
-    res.status(500).json({ error: 'Server fail to get' });
+    res.status(500).json({ error: 'Server failed to get portfolios' });
   }
 });
 
@@ -237,6 +237,142 @@ router.get('/realized/:accountId', async (req, res) => {
   }
 });
 
+
+// Gem daglig værdi af alle porteføljer (Kaldes fx fra Postman)
+router.post('/snapshot', async (req, res) => {
+  try {
+    const pool = await getConnection();
+
+    // Hent alle porteføljer med deres værdi og valuta
+    const result = await pool.request().query(`
+      SELECT 
+        Portfolios.id AS portfolioId,
+        SUM(
+          CASE 
+            WHEN Trades.trade_type = 'BUY' THEN Trades.quantity * Trades.total_price / NULLIF(Trades.quantity, 0)
+            WHEN Trades.trade_type = 'SELL' THEN -Trades.quantity * Trades.total_price / NULLIF(Trades.quantity, 0)
+            ELSE 0
+          END
+        ) AS totalValue,
+        Accounts.currency
+      FROM Portfolios
+      LEFT JOIN Trades ON Trades.portfolio_id = Portfolios.id
+      JOIN Accounts ON Accounts.id = Portfolios.account_id
+      GROUP BY Portfolios.id, Accounts.currency
+    `);
+
+    // Gem snapshot for hver portefølje
+    for (const row of result.recordset) {
+      await pool.request()
+        .input("portfolio_id", sql.Int, row.portfolioId)
+        .input("value", sql.Decimal(18, 2), row.totalValue || 0)
+        .input("currency", sql.NVarChar, row.currency)
+        .query(`
+          INSERT INTO PortfolioHistory (portfolio_id, value, currency)
+          VALUES (@portfolio_id, @value, @currency)
+        `);
+    }
+
+    res.json({ success: true, message: `${result.recordset.length} snapshots saved` });
+  } catch (err) {
+    console.error("Fejl ved snapshot:", err);
+    res.status(500).json({ error: "Snapshot failed" });
+  }
+});
+
+
+// Returner ændringer over tid for samlet værdi (24h, 7d, 30d)
+router.get('/change/:accountId', async (req, res) => {
+  const accountId = parseInt(req.params.accountId);
+
+  try {
+    const pool = await getConnection();
+
+    const query = `
+      SELECT 
+        PortfolioHistory.value,
+        PortfolioHistory.recorded_at
+      FROM PortfolioHistory
+      JOIN Portfolios ON PortfolioHistory.portfolio_id = Portfolios.id
+      WHERE Portfolios.account_id = @accountId
+        AND PortfolioHistory.recorded_at >= DATEADD(DAY, -30, GETDATE())
+      ORDER BY PortfolioHistory.recorded_at DESC
+    `;
+
+    const result = await pool.request()
+      .input('accountId', sql.Int, accountId)
+      .query(query);
+
+    const latest = result.recordset[0]?.value || 0;
+
+    const getClosest = (days) => {
+      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+      const match = result.recordset.find(r => new Date(r.recorded_at).getTime() <= cutoff);
+      return match?.value || latest;
+    };
+
+    const d1 = getClosest(1);
+    const d7 = getClosest(7);
+    const d30 = getClosest(30);
+
+    const pct = (a, b) => b === 0 ? '0.00%' : `${(((a - b) / b) * 100).toFixed(2)}%`;
+
+    res.json({
+      change24h: pct(latest, d1),
+      change7d: pct(latest, d7),
+      change30d: pct(latest, d30)
+    });
+  } catch (err) {
+    console.error("Fejl ved hentning af ændringer:", err);
+    res.status(500).json({ error: "Serverfejl ved change data" });
+  }
+});
+
+
+// Returner 24h ændring per portefølje
+router.get('/change/individual/:accountId', async (req, res) => {
+  const accountId = parseInt(req.params.accountId);
+
+  try {
+    const pool = await getConnection();
+
+    const result = await pool.request()
+      .input('accountId', sql.Int, accountId)
+      .query(`
+        SELECT 
+          PortfolioHistory.portfolio_id,
+          PortfolioHistory.value,
+          PortfolioHistory.recorded_at
+        FROM PortfolioHistory
+        JOIN Portfolios ON PortfolioHistory.portfolio_id = Portfolios.id
+        WHERE Portfolios.account_id = @accountId
+          AND PortfolioHistory.recorded_at >= DATEADD(DAY, -2, GETDATE())
+        ORDER BY PortfolioHistory.recorded_at DESC
+      `);
+
+    const grouped = {};
+
+    for (const row of result.recordset) {
+      const pid = row.portfolio_id;
+      if (!grouped[pid]) grouped[pid] = [];
+      grouped[pid].push({ value: row.value, recorded_at: row.recorded_at });
+    }
+
+    const changes = {};
+    for (const [pid, entries] of Object.entries(grouped)) {
+      const sorted = entries.sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
+      const latest = sorted[0]?.value || 0;
+      const prev = sorted.find(e => new Date(e.recorded_at).getTime() < Date.now() - 24 * 60 * 60 * 1000)?.value || latest;
+      const pct = prev === 0 ? 0 : ((latest - prev) / prev) * 100;
+      changes[pid] = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+    }
+
+    res.json(changes);
+  } catch (err) {
+    console.error("Fejl ved individuelle ændringer:", err);
+    res.status(500).json({ error: "Serverfejl" });
+  }
+});
 
 
 

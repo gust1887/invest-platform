@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("portfolioHeading").innerText = name ? `Securities in ${name}` : "Securities Overview";
 
   if (!portfolioId) {
-    alert("Ingen portefølje valgt.");
+    alert("No portfolio chosen.");
     return;
   }
 
@@ -28,8 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const cached = getCachedPrice(security.ticker);
       const currentPrice = Number.isFinite(cached) ? cached : 100;
       const total = currentPrice * security.totalQuantity;
-
-      const change24h = "+0.00%"; // placeholder
+      const change24h = get24hChange(security.ticker);
 
       totalValue += total;
 
@@ -54,6 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Grøn farve for positiv værdi
     totalVal.style.color = totalValue > 0 ? "#4caf50" : "white";
 
+    
 
     // Tegn donut chart
     const ctx = document.getElementById("securitiesChart").getContext("2d");
@@ -137,3 +137,25 @@ async function opdaterAlleKurser() {
     alert("Could not update shares.");
   }
 }
+
+// Beregn 24 timers ændring baseret på localStorage data
+const get24hChange = symbol => {
+  const raw = localStorage.getItem(`stockData-${symbol}`);
+  if (!raw) return "0.00%";
+
+  const parsed = JSON.parse(raw);
+  const prices = parsed.data;
+
+  if (!prices || prices.length < 2) return "0.00%";
+
+  const current = prices[prices.length - 1].pris;
+  const yesterday = prices[prices.length - 2]?.pris;
+
+  if (!current || !yesterday || yesterday === 0) return "0.00%";
+
+  const diff = current - yesterday;
+  const pct = (diff / yesterday) * 100;
+  const formatted = `${pct > 0 ? '+' : ''}${pct.toFixed(2)}%`;
+  return formatted;
+}
+

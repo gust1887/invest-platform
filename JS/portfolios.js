@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Kør ved page load
   getAndShowPortfolios();
+  getAndShowChange();
+  getAndShowIndividualChanges();
 
 
 
@@ -59,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const changeCell = document.createElement("td");
         changeCell.classList.add("green");
-        changeCell.textContent = "+0.00%"; // Placeholder
+changeCell.setAttribute("data-portfolio-id", p.id); // midlertidig markør
 
         const dateCell = document.createElement("td");
         dateCell.textContent = p.lastTrade
@@ -92,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Fejl ved hentning af porteføljer:", err);
     }
   }
+
 
 
 
@@ -204,6 +207,45 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+
+  async function getAndShowChange() {
+    const accountId = sessionStorage.getItem("selectedAccountId");
+    if (!accountId) return;
+
+    try {
+      const res = await fetch(`/api/portfolios/change/${accountId}`);
+      const data = await res.json();
+
+      document.getElementById("change24h").innerText = data.change24h;
+      document.getElementById("change7d").innerText = data.change7d;
+      document.getElementById("change30d").innerText = data.change30d;
+    } catch (err) {
+      console.error("Fejl ved hentning af ændringer:", err);
+    }
+  }
+
+
+async function getAndShowIndividualChanges() {
+  const accountId = sessionStorage.getItem("selectedAccountId");
+  if (!accountId) return;
+
+  try {
+    const res = await fetch(`/api/portfolios/change/individual/${accountId}`);
+    const changes = await res.json();
+
+    // Find alle rækker og opdater den celle med data-portfolio-id
+    document.querySelectorAll("td[data-portfolio-id]").forEach(cell => {
+      const pid = cell.getAttribute("data-portfolio-id");
+      const value = changes[pid] || "0.00%";
+      cell.textContent = value;
+      cell.className = value.startsWith('-') ? "red" : "green";
+    });
+  } catch (err) {
+    console.error("Fejl ved porteføljeændringer:", err);
+  }
+}
+
 
 });
 
