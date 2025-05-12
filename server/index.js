@@ -20,6 +20,14 @@ const port = 5001;
 
 app.use(express.json()); // Gør det muligt at læse JSON i req.body
 
+// Henter image til visning 
+const express = require('express');
+const path = require('path');
+const app = express();
+
+// Gør HTML-mappen og dens undermapper offentlige
+app.use(express.static(path.join(__dirname, '../HTML')));
+
 
 //Henter aktiedata fra Alpha Vantage 
 
