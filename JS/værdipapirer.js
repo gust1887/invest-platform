@@ -1,4 +1,6 @@
+// Henter og viser værdipapirer i den valgte portefølje ved sideindlæsning
 document.addEventListener("DOMContentLoaded", async () => {
+  // Henter det valgte portefølje-ID fra sessionStorage
   const portfolioId = sessionStorage.getItem("selectedPortfolioId");
 
   const name = sessionStorage.getItem("selectedPortfolioName");
@@ -26,8 +28,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     securities.forEach(security => {
       const cached = getCachedPrice(security.ticker);
+      // Bruger cached pris hvis tilgængelig, ellers fallback til dummy-pris 100
       const currentPrice = Number.isFinite(cached) ? cached : 100;
       const total = currentPrice * security.totalQuantity;
+      // Henter 24-timers kursændring fra localStorage
       const change24h = get24hChange(security.ticker);
 
       totalValue += total;
@@ -53,9 +57,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Grøn farve for positiv værdi
     totalVal.style.color = totalValue > 0 ? "#4caf50" : "white";
 
-    
 
-    // Tegn donut chart
+
+    // Tegner donut-diagram over værdipapirernes værdi
     const ctx = document.getElementById("securitiesChart").getContext("2d");
     new Chart(ctx, {
       type: "doughnut",
@@ -91,7 +95,7 @@ function handleSell() {
   window.location.href = "sellstocks.html";
 }
 
-
+// Returnerer cached pris for en aktie hvis data er under 24 timer gammelt
 function getCachedPrice(symbol) {
   const raw = localStorage.getItem(`stockData-${symbol}`);
   if (!raw) return null;

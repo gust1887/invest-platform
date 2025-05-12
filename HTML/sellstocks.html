@@ -26,8 +26,8 @@
 <body>
     <!-- Sidebar med navigation -->
     <div class="sidebar">
-            <!-- Logo -->
-            <img src="/images/BIT.png" alt="BIT logo" class="form-logo">
+        <!-- Logo -->
+        <img src="/images/BIT.png" alt="BIT logo" class="form-logo">
         <ul class="nav-links">
             <li><a href="dashboard.html" class="active">Dashboard</a></li>
             <li><a href="accounts.html">Accounts</a></li>
@@ -85,7 +85,7 @@
         let graf;
         let aktuelPris;
 
-        // Aktiedata cache
+        // Returnerer cached aktiedata fra localStorage hvis det er mindre end 24 timer gammelt
         function getFromCache(symbol) {
             const key = `stockData-${symbol}`;
             const raw = localStorage.getItem(key);
@@ -100,6 +100,7 @@
             return null;
         }
 
+        // Gemmer aktiedata i localStorage med timestamp for caching
         function saveToCache(symbol, data) {
             const key = `stockData-${symbol}`;
             localStorage.setItem(key, JSON.stringify({
@@ -108,7 +109,7 @@
             }));
         }
 
-        // Nøgletal cache
+        // Returnerer cached nøgletal hvis ikke for gamle
         function getMetricsFromCache(symbol) {
             const key = `metrics-${symbol}`;
             const raw = localStorage.getItem(key);
@@ -123,6 +124,7 @@
             return null;
         }
 
+        // Gemmer nøgletal i localStorage med timestamp
         function saveMetricsToCache(symbol, data) {
             const key = `metrics-${symbol}`;
             localStorage.setItem(key, JSON.stringify({
@@ -131,21 +133,23 @@
             }));
         }
 
-        // Henter og viser alt data
+        // Hovedfunktion der henter og viser aktiekurser og nøgletal for den indtastede tickersymbol
         function hent() {
             const symbol = document.getElementById('symbol').value.trim().toUpperCase();
 
+            // Tjekker om brugeren har skrevet et tickersymbol
             if (!symbol) {
                 alert("Please enter a ticker symbol");
                 return;
             }
 
-            // Aktiedata
+            // Prøver at hente aktiekurser fra cache først
             const cachedData = getFromCache(symbol);
             if (cachedData) {
                 console.log("Bruger cached aktiedata for", symbol);
                 visGrafOgPris(cachedData, symbol);
             } else {
+                // Hvis ikke i cache: henter aktiedata fra backend
                 fetch(`/api/${symbol}`)
                     .then(res => res.json())
                     .then(data => {
@@ -160,12 +164,13 @@
                     });
             }
 
-            // Nøgletal
+            // Prøver at hente nøgletal fra cache først
             const cachedMetrics = getMetricsFromCache(symbol);
             if (cachedMetrics) {
                 console.log("Bruger cached nøgletal for", symbol);
                 visNøgletal(cachedMetrics);
             } else {
+                // Hvis ikke i cache: henter nøgletal fra backend
                 fetch(`/api/nogletal/${symbol}`)
                     .then(res => res.json())
                     .then(metrics => {
@@ -182,7 +187,7 @@
             }
         }
 
-        // Viser graf
+        // Viser linjegraf over kursudviklingen og viser aktuel pris
         function visGrafOgPris(data, symbol) {
             const datoer = data.map(d => d.dato);
             const priser = data.map(d => d.pris);
@@ -206,7 +211,7 @@
             });
         }
 
-        // Viser nøgletal
+        // Viser nøgletal (P/E, EPS, Market Cap osv.) i UI
         function visNøgletal(metrics) {
             const list = document.getElementById('metrics-list');
             list.innerHTML = `
@@ -217,7 +222,7 @@
             <li><strong>Dividend in percentage (%):</strong> ${metrics.dividendYield}</li>`;
         }
 
-
+        // Funktion der håndterer salget af aktier – sender POST-request til serveren
         window.sælgAktie = function sælgAktie() {
             const symbol = document.getElementById('symbol').value;
             const amount = parseInt(document.getElementById('quantity').value);
@@ -227,13 +232,14 @@
 
             const price = aktuelPris;
 
+            // Validerer inputfelterne før salget gennemføres
             if (!symbol || !amount || !price || price <= 0 || amount <= 0) {
                 document.getElementById('sell-message').innerText = "Invalid input";
                 return;
             }
 
 
-
+            // Sender POST-request til /api/sell med data om salget
             fetch('/api/sell', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -246,6 +252,7 @@
                     portfolioId: parseInt(portfolioId)
                 })
             })
+                // Viser resultatet af salget i UI’et (succes eller fejlbesked)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {

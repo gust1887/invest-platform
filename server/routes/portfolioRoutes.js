@@ -19,9 +19,9 @@ router.post('/', async (req, res) => {
       .input('account_id', sql.Int, account_id)
       .input('user_id', sql.Int, user_id)
       .query(`
-          INSERT INTO Portfolios (portfolioName, account_id, user_id)
-          VALUES (@portfolioName, @account_id, @user_id)
-        `);
+            INSERT INTO Portfolios (portfolioName, account_id, user_id)
+            VALUES (@portfolioName, @account_id, @user_id)
+          `);
 
     res.status(201).json({ message: 'Portofole created' });
   } catch (err) {
@@ -55,28 +55,28 @@ router.get('/:portfolioId/securities', async (req, res) => {
 
   try {
     const pool = await getConnection();
-
+    // Udregner nettobeholdning for hvert værdipapir: køb lægges til, salg trækkes fra
     const result = await pool.request()
       .input('portfolioId', sql.Int, portfolioId)
       .query(`
-SELECT 
-  Securities.securitiesName,
-  Securities.ticker,
-  SUM(CASE 
-        WHEN Trades.trade_type = 'BUY' THEN Trades.quantity
-        WHEN Trades.trade_type = 'SELL' THEN -Trades.quantity
-        ELSE 0
-      END) AS totalQuantity
-FROM Trades
-JOIN Securities ON Trades.security_id = Securities.id
-WHERE Trades.portfolio_id = @portfolioId
-GROUP BY Securities.securitiesName, Securities.ticker
-HAVING SUM(CASE 
-             WHEN Trades.trade_type = 'BUY' THEN Trades.quantity
-             WHEN Trades.trade_type = 'SELL' THEN -Trades.quantity
-             ELSE 0
-           END) > 0
-      `);
+  SELECT 
+    Securities.securitiesName,
+    Securities.ticker,
+    SUM(CASE 
+          WHEN Trades.trade_type = 'BUY' THEN Trades.quantity
+          WHEN Trades.trade_type = 'SELL' THEN -Trades.quantity
+          ELSE 0
+        END) AS totalQuantity
+  FROM Trades
+  JOIN Securities ON Trades.security_id = Securities.id
+  WHERE Trades.portfolio_id = @portfolioId
+  GROUP BY Securities.securitiesName, Securities.ticker
+  HAVING SUM(CASE 
+              WHEN Trades.trade_type = 'BUY' THEN Trades.quantity
+              WHEN Trades.trade_type = 'SELL' THEN -Trades.quantity
+              ELSE 0
+            END) > 0
+        `);
 
     res.json(result.recordset);
   } catch (err) {
@@ -95,33 +95,34 @@ router.get('/summary/:accountId', async (req, res) => {
     const result = await pool.request()
       .input('account_id', sql.Int, accountId)
       .query(`
-SELECT 
-  Portfolios.id,
-  Portfolios.portfolioName,
+  SELECT 
+    Portfolios.id,
+    Portfolios.portfolioName,
 
+-- Finder datoen for seneste handel i hver portefølje
 
-  MAX(Trades.created_at) AS lastTrade,
+    MAX(Trades.created_at) AS lastTrade,
 
-  -- Totalværdi beregnet som: nettobeholdning * gennemsnitlig pris
-SUM(
-  CASE 
-    WHEN Trades.trade_type = 'BUY' THEN Trades.quantity * Trades.total_price / NULLIF(Trades.quantity, 0)
-    WHEN Trades.trade_type = 'SELL' THEN -1 * Trades.quantity * Trades.total_price / NULLIF(Trades.quantity, 0)
-    ELSE 0
-  END
-) AS totalValue
+-- Beregner samlet værdi af porteføljen ved at gange mængde med gennemsnitlig pris (GAK)
+  SUM(
+    CASE 
+      WHEN Trades.trade_type = 'BUY' THEN Trades.quantity * Trades.total_price / NULLIF(Trades.quantity, 0)
+      WHEN Trades.trade_type = 'SELL' THEN -1 * Trades.quantity * Trades.total_price / NULLIF(Trades.quantity, 0)
+      ELSE 0
+    END
+  ) AS totalValue
 
-FROM Portfolios
+  FROM Portfolios
 
--- Join alle handler knyttet til porteføljen
-LEFT JOIN Trades ON Trades.portfolio_id = Portfolios.id
+  -- Join alle handler knyttet til porteføljen
+  LEFT JOIN Trades ON Trades.portfolio_id = Portfolios.id
 
--- Kun for porteføljer under en bestemt konto
-WHERE Portfolios.account_id = @account_id
+  -- Kun for porteføljer under en bestemt konto
+  WHERE Portfolios.account_id = @account_id
 
--- Grupper pr. portefølje
-GROUP BY Portfolios.id, Portfolios.portfolioName
-      `);
+  -- Grupper pr. portefølje
+  GROUP BY Portfolios.id, Portfolios.portfolioName
+        `);
 
     res.json(result.recordset);
   } catch (err) {
@@ -140,22 +141,26 @@ router.get('/unrealized/:accountId', async (req, res) => {
     const result = await pool.request()
       .input("accountId", sql.Int, accountId)
       .query(`
-        SELECT 
-          Securities.ticker,
-          Securities.securitiesName,
-          SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE -Trades.quantity END) AS totalQuantity,
-          SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.total_price ELSE 0 END) AS totalBuyCost,
-          SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE 0 END) AS totalBoughtQty,
-          MAX(Trades.total_price / NULLIF(Trades.quantity, 0)) AS latestPrice
-        FROM Trades
-        JOIN Securities ON Securities.id = Trades.security_id
-        JOIN Portfolios ON Portfolios.id = Trades.portfolio_id
-        WHERE Portfolios.account_id = @accountId
-        GROUP BY Securities.ticker, Securities.securitiesName
-        HAVING SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE -Trades.quantity END) > 0
-      `);
+          SELECT 
+            Securities.ticker,
+            Securities.securitiesName,
+
+            -- Udtrækker relevante data for urealiseret gevinst:
+            SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE -Trades.quantity END) AS totalQuantity, -- totalQuantity: samlet nettobeholdning = køb - salg
+            SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.total_price ELSE 0 END) AS totalBuyCost, -- totalBuyCost: samlet beløb brugt på køb
+            SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE 0 END) AS totalBoughtQty, -- totalBoughtQty: totalt antal købte aktier
+            MAX(Trades.total_price / NULLIF(Trades.quantity, 0)) AS latestPrice -- latestPrice: seneste pris brugt som estimeret markedspris
+          FROM Trades
+          JOIN Securities ON Securities.id = Trades.security_id
+          JOIN Portfolios ON Portfolios.id = Trades.portfolio_id
+          WHERE Portfolios.account_id = @accountId
+          GROUP BY Securities.ticker, Securities.securitiesName
+          HAVING SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE -Trades.quantity END) > 0
+        `);
 
     const data = result.recordset.map(row => {
+      // Udregner gennemsnitlig købspris, aktuel værdi og kostpris
+      // Bruges til at beregne urealiseret gevinst (værdi - kostpris)
       const avgBuyPrice = row.totalBoughtQty > 0 ? row.totalBuyCost / row.totalBoughtQty : 0;
       const currentValue = row.totalQuantity * row.latestPrice;
       const costBasis = row.totalQuantity * avgBuyPrice;
@@ -190,44 +195,48 @@ router.get('/realized/:accountId', async (req, res) => {
     const result = await pool.request()
       .input("accountId", sql.Int, accountId)
       .query(`
-        WITH BuyData AS (
+          WITH BuyData AS (
+          -- BuyData indeholder alle køb, SellData indeholder alle salg
+          -- Disse bruges til at sammenligne salgsindtægt og kostpris for at beregne realiseret gevinst
+            SELECT 
+              Securities.id AS securityId,
+              Securities.ticker,
+              SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.total_price ELSE 0 END) AS totalBuyCost,
+              SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE 0 END) AS totalBoughtQty
+            FROM Trades
+            JOIN Securities ON Securities.id = Trades.security_id
+            JOIN Portfolios ON Portfolios.id = Trades.portfolio_id
+            WHERE Portfolios.account_id = @accountId
+            GROUP BY Securities.id, Securities.ticker
+          ),
+          SellData AS (
+            SELECT 
+              Securities.id AS securityId,
+              Securities.ticker,
+              SUM(CASE WHEN Trades.trade_type = 'SELL' THEN Trades.total_price ELSE 0 END) AS totalSellValue,
+              SUM(CASE WHEN Trades.trade_type = 'SELL' THEN Trades.quantity ELSE 0 END) AS totalSoldQty
+            FROM Trades
+            JOIN Securities ON Securities.id = Trades.security_id
+            JOIN Portfolios ON Portfolios.id = Trades.portfolio_id
+            WHERE Portfolios.account_id = @accountId
+            GROUP BY Securities.id, Securities.ticker
+          )
           SELECT 
-            Securities.id AS securityId,
-            Securities.ticker,
-            SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.total_price ELSE 0 END) AS totalBuyCost,
-            SUM(CASE WHEN Trades.trade_type = 'BUY' THEN Trades.quantity ELSE 0 END) AS totalBoughtQty
-          FROM Trades
-          JOIN Securities ON Securities.id = Trades.security_id
-          JOIN Portfolios ON Portfolios.id = Trades.portfolio_id
-          WHERE Portfolios.account_id = @accountId
-          GROUP BY Securities.id, Securities.ticker
-        ),
-        SellData AS (
-          SELECT 
-            Securities.id AS securityId,
-            Securities.ticker,
-            SUM(CASE WHEN Trades.trade_type = 'SELL' THEN Trades.total_price ELSE 0 END) AS totalSellValue,
-            SUM(CASE WHEN Trades.trade_type = 'SELL' THEN Trades.quantity ELSE 0 END) AS totalSoldQty
-          FROM Trades
-          JOIN Securities ON Securities.id = Trades.security_id
-          JOIN Portfolios ON Portfolios.id = Trades.portfolio_id
-          WHERE Portfolios.account_id = @accountId
-          GROUP BY Securities.id, Securities.ticker
-        )
-        SELECT 
-          BuyData.ticker,
-          BuyData.totalBoughtQty,
-          SellData.totalSoldQty,
-          BuyData.totalBuyCost,
-          SellData.totalSellValue,
-          (
-            SellData.totalSellValue - 
-            (SellData.totalSoldQty * (BuyData.totalBuyCost / NULLIF(BuyData.totalBoughtQty, 0)))
-          ) AS realizedGain
-        FROM BuyData
-        JOIN SellData ON SellData.securityId = BuyData.securityId
-        WHERE SellData.totalSoldQty > 0
-      `);
+            BuyData.ticker,
+            BuyData.totalBoughtQty,
+            SellData.totalSoldQty,
+            BuyData.totalBuyCost,
+            SellData.totalSellValue,
+            (
+            -- Beregner realiseret gevinst:
+            -- salgsindtægt minus (antal solgte * gennemsnitlig købspris)
+              SellData.totalSellValue - 
+              (SellData.totalSoldQty * (BuyData.totalBuyCost / NULLIF(BuyData.totalBoughtQty, 0)))
+            ) AS realizedGain
+          FROM BuyData
+          JOIN SellData ON SellData.securityId = BuyData.securityId
+          WHERE SellData.totalSoldQty > 0
+        `);
 
     const totalRealized = result.recordset.reduce((sum, s) => sum + (s.realizedGain || 0), 0);
     res.json({ total: totalRealized, details: result.recordset });
@@ -245,21 +254,22 @@ router.post('/snapshot', async (req, res) => {
 
     // Hent alle porteføljer med deres værdi og valuta
     const result = await pool.request().query(`
-      SELECT 
-        Portfolios.id AS portfolioId,
-        SUM(
-          CASE 
-            WHEN Trades.trade_type = 'BUY' THEN Trades.quantity * Trades.total_price / NULLIF(Trades.quantity, 0)
-            WHEN Trades.trade_type = 'SELL' THEN -Trades.quantity * Trades.total_price / NULLIF(Trades.quantity, 0)
-            ELSE 0
-          END
-        ) AS totalValue,
-        Accounts.currency
-      FROM Portfolios
-      LEFT JOIN Trades ON Trades.portfolio_id = Portfolios.id
-      JOIN Accounts ON Accounts.id = Portfolios.account_id
-      GROUP BY Portfolios.id, Accounts.currency
-    `);
+      -- Beregner og gemmer daglig værdi og valuta for hver portefølje i PortfolioHistory
+        SELECT 
+          Portfolios.id AS portfolioId,
+          SUM(
+            CASE 
+              WHEN Trades.trade_type = 'BUY' THEN Trades.quantity * Trades.total_price / NULLIF(Trades.quantity, 0)
+              WHEN Trades.trade_type = 'SELL' THEN -Trades.quantity * Trades.total_price / NULLIF(Trades.quantity, 0)
+              ELSE 0
+            END
+          ) AS totalValue,
+          Accounts.currency
+        FROM Portfolios
+        LEFT JOIN Trades ON Trades.portfolio_id = Portfolios.id
+        JOIN Accounts ON Accounts.id = Portfolios.account_id
+        GROUP BY Portfolios.id, Accounts.currency
+      `);
 
     // Gem snapshot for hver portefølje
     for (const row of result.recordset) {
@@ -268,9 +278,9 @@ router.post('/snapshot', async (req, res) => {
         .input("value", sql.Decimal(18, 2), row.totalValue || 0)
         .input("currency", sql.NVarChar, row.currency)
         .query(`
-          INSERT INTO PortfolioHistory (portfolio_id, value, currency)
-          VALUES (@portfolio_id, @value, @currency)
-        `);
+            INSERT INTO PortfolioHistory (portfolio_id, value, currency)
+            VALUES (@portfolio_id, @value, @currency)
+          `);
     }
 
     res.json({ success: true, message: `${result.recordset.length} snapshots saved` });
@@ -289,15 +299,15 @@ router.get('/change/:accountId', async (req, res) => {
     const pool = await getConnection();
 
     const query = `
-      SELECT 
-        PortfolioHistory.value,
-        PortfolioHistory.recorded_at
-      FROM PortfolioHistory
-      JOIN Portfolios ON PortfolioHistory.portfolio_id = Portfolios.id
-      WHERE Portfolios.account_id = @accountId
-        AND PortfolioHistory.recorded_at >= DATEADD(DAY, -30, GETDATE())
-      ORDER BY PortfolioHistory.recorded_at DESC
-    `;
+        SELECT 
+          PortfolioHistory.value,
+          PortfolioHistory.recorded_at
+        FROM PortfolioHistory
+        JOIN Portfolios ON PortfolioHistory.portfolio_id = Portfolios.id
+        WHERE Portfolios.account_id = @accountId
+          AND PortfolioHistory.recorded_at >= DATEADD(DAY, -30, GETDATE())
+        ORDER BY PortfolioHistory.recorded_at DESC
+      `;
 
     const result = await pool.request()
       .input('accountId', sql.Int, accountId)
@@ -305,6 +315,8 @@ router.get('/change/:accountId', async (req, res) => {
 
     const latest = result.recordset[0]?.value || 0;
 
+    // Finder den værdi der ligger tættest på tidspunktet for X dage siden
+    // Bruges til at beregne ændring over 1, 7 og 30 dage
     const getClosest = (days) => {
       const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
       const match = result.recordset.find(r => new Date(r.recorded_at).getTime() <= cutoff);
@@ -339,16 +351,16 @@ router.get('/change/individual/:accountId', async (req, res) => {
     const result = await pool.request()
       .input('accountId', sql.Int, accountId)
       .query(`
-        SELECT 
-          PortfolioHistory.portfolio_id,
-          PortfolioHistory.value,
-          PortfolioHistory.recorded_at
-        FROM PortfolioHistory
-        JOIN Portfolios ON PortfolioHistory.portfolio_id = Portfolios.id
-        WHERE Portfolios.account_id = @accountId
-          AND PortfolioHistory.recorded_at >= DATEADD(DAY, -2, GETDATE())
-        ORDER BY PortfolioHistory.recorded_at DESC
-      `);
+          SELECT 
+            PortfolioHistory.portfolio_id,
+            PortfolioHistory.value,
+            PortfolioHistory.recorded_at
+          FROM PortfolioHistory
+          JOIN Portfolios ON PortfolioHistory.portfolio_id = Portfolios.id
+          WHERE Portfolios.account_id = @accountId
+            AND PortfolioHistory.recorded_at >= DATEADD(DAY, -2, GETDATE())
+          ORDER BY PortfolioHistory.recorded_at DESC
+        `);
 
     const grouped = {};
 
@@ -360,6 +372,7 @@ router.get('/change/individual/:accountId', async (req, res) => {
 
     const changes = {};
     for (const [pid, entries] of Object.entries(grouped)) {
+      // Finder seneste og tidligere snapshot for hver portefølje og udregner procentvis ændring over 24 timer
       const sorted = entries.sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
       const latest = sorted[0]?.value || 0;
       const prev = sorted.find(e => new Date(e.recorded_at).getTime() < Date.now() - 24 * 60 * 60 * 1000)?.value || latest;

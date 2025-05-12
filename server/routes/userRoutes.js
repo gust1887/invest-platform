@@ -14,7 +14,7 @@ const router = express.Router();
 router.post('/opretbruger', async (req, res) => {
   // Vi henter de tre felter fra body'en i requesten
   const { username, password, email } = req.body;
-  
+
   try {
     // Vi opretter forbindelse til databasen (hentes en gang og genbruges)
     const pool = await getConnection();
@@ -22,7 +22,7 @@ router.post('/opretbruger', async (req, res) => {
     // Vi opretter en SQL-forespørgsel og sender de tre værdier som parametre
     await pool.request()
       .input('username', sql.NVarChar, username)  // Beskytter mod SQL injection
-      .input('password', sql.NVarChar, password)  
+      .input('password', sql.NVarChar, password)
       .input('email', sql.NVarChar, email)
       .query(`
         INSERT INTO Users (username, password, email)
@@ -34,6 +34,12 @@ router.post('/opretbruger', async (req, res) => {
   } catch (err) {
     // Hvis noget går galt, skriver vi fejlen i konsollen
     console.error(err);
+
+    if (err.number === 2627) {
+      // Duplicate key
+      return res.status(400).json({ error: "Username already in use" });
+    }
+
     // Sender en fejlmeddelelse tilbage til klienten
     res.status(500).json({ error: "Error when creating user" });
   }
@@ -65,7 +71,7 @@ router.post('/login', async (req, res) => {
         message: 'Du er nu logget ind.',
         userId: result.recordset[0].id  // ← kolonnenavnet i din Users-tabel
       });
-      
+
     } else {
       // Hvis ingen bruger matcher, send 401 Unauthorized med fejlbesked
       res.status(401).json({ error: 'Forkert brugernavn eller adgangskode.' });

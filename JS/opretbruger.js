@@ -26,13 +26,7 @@ document.getElementById('signupForm').addEventListener('submit', async function 
     return;
   }
 
-  // Tjek om brugernavnet allerede findes
-  const existingUser = users.find(u => u.username === newUsername);
-  if (existingUser) {
-    document.getElementById('signupMessage').innerText = 'Brugernavn er allerede i brug.';
-    return;
-  }
-
+  
   // Tilføj bruger
   try {
     console.log("Sender til server:", newUsername, newPassword, newEmail);

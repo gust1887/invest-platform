@@ -8,7 +8,7 @@ const accountRoutes = require('./routes/accountRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 
 //API KEY 
-const API_KEY = 'SPJG5Q18L7YNPKXQ'; 
+const API_KEY = 'SPJG5Q18L7YNPKXQ';
 
 // Connection til SQL db 
 const { getConnection } = require('./database');
@@ -25,31 +25,30 @@ app.use(express.json()); // Gør det muligt at læse JSON i req.body
 app.use(express.static(path.join(__dirname, '../HTML')));
 
 
-//Henter aktiedata fra Alpha Vantage 
-
-app.get('/api/:symbol', async(req,res) => {
+// Henter de seneste 7 dages aktiekurser for et givet symbol fra Alpha Vantage
+app.get('/api/:symbol', async (req, res) => {
   const symbol = req.params.symbol;
   const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${API_KEY}`;
-  
+
   const svar = await fetch(url);
   const json = await svar.json();
   const data = json['Time Series (Daily)'];
-  
+
   // Hvis data ikke er opfyldt vil den returnere en intern data fejl (500)
-  if(!data) return res.status(500).json({error: 'Data could not be found or wrong'});
+  if (!data) return res.status(500).json({ error: 'Data could not be found or wrong' });
 
   const resultat = Object.entries(data)
-  .slice(0,7)
-  .map(([dato, værdier]) => ({
-    dato, 
-    pris: parseFloat(værdier['4. close'])
-  }))
-  .reverse()
+    .slice(0, 7)
+    // Konverterer API-data til et array med dato og lukkekurs (pris), sorteret stigende
+    .map(([dato, værdier]) => ({
+      dato,
+      pris: parseFloat(værdier['4. close'])
+    }))
+    .reverse()
   res.json(resultat);
 });
 
 // Henter nøgletal fra Alpha Vantage 
-
 app.get('/api/nogletal/:symbol', async (req, res) => {
   const symbol = req.params.symbol;
   const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${API_KEY}`;
@@ -62,6 +61,7 @@ app.get('/api/nogletal/:symbol', async (req, res) => {
       return res.status(500).json({ error: 'No key figures could be found' });
     }
 
+    // Udtrækker relevante felter fra API-svaret og omdøber dem til dansk format
     const data = {
       pe: json.PERatio,
       volume: json.Volume,
@@ -76,23 +76,26 @@ app.get('/api/nogletal/:symbol', async (req, res) => {
   }
 });
 
-//Henter det valgte mængde og prisen på købet ind i databasen
+// Endpoint til køb af aktier – opretter værdipapir, tjekker saldo, indsætter køb og opdaterer saldo
 app.post('/api/buy', async (req, res) => {
   const { symbol, amount, price, currency, accountId, portfolioId } = req.body;
 
+  // Udregner totalprisen for handlen (antal * pris)
   const totalPrice = price * amount;
 
   try {
     const pool = await getConnection();
 
 
-    //  Find eller opret security
+    //  Find eller opret security - Tjekker om værdipapiret allerede findes i databasen
+
     let secResult = await pool.request()
       .input('ticker', sql.NVarChar, symbol)
       .query('SELECT id FROM Securities WHERE ticker = @ticker');
 
     let securityId;
     if (secResult.recordset.length === 0) {
+      // Hvis værdipapiret ikke findes, opretter vi det i Securities-tabellen
       const insertSec = await pool.request()
         .input('securitiesName', sql.NVarChar, symbol) // evt. bedre navn senere
         .input('ticker', sql.NVarChar, symbol)
@@ -107,7 +110,7 @@ app.post('/api/buy', async (req, res) => {
       securityId = secResult.recordset[0].id;
     }
 
-    // Tjek saldo
+    // Tjekker om der er nok saldo på kontoen til at dække købet
     const balanceCheck = await pool.request()
       .input('accountId', sql.Int, accountId)
       .query('SELECT balance FROM Accounts WHERE id = @accountId');
@@ -117,7 +120,7 @@ app.post('/api/buy', async (req, res) => {
       return res.status(400).json({ success: false, message: "Insufficient funds." });
     }
 
-    //  Indsæt trade
+    // Indsætter selve handlen som en 'BUY' i Trades-tabellen
     await pool.request()
       .input('portfolioId', sql.Int, portfolioId)
       .input('accountId', sql.Int, accountId)
@@ -131,7 +134,7 @@ app.post('/api/buy', async (req, res) => {
         VALUES (@portfolioId, @accountId, @securityId, @amount, @totalPrice, @fee, @type)
       `);
 
-    //  Træk pengene fra konto
+    // Trækker købsbeløbet fra kontoen
     await pool.request()
       .input('amount', sql.Decimal(18, 2), totalPrice)
       .input('accountId', sql.Int, accountId)
@@ -150,16 +153,17 @@ app.post('/api/buy', async (req, res) => {
 });
 
 
-
+// Endpoint til salg af aktier – tjekker beholdning, indsætter salg og opdaterer saldo
 app.post('/api/sell', async (req, res) => {
   const { symbol, amount, price, currency, accountId, portfolioId } = req.body;
 
+  // Udregner total salgspris
   const totalPrice = price * amount;
 
   try {
     const pool = await getConnection();
 
-    // Find security
+    // Finder værdipapiret i databasen ud fra symbol
     const secResult = await pool.request()
       .input('ticker', sql.NVarChar, symbol)
       .query('SELECT id FROM Securities WHERE ticker = @ticker');
@@ -170,7 +174,7 @@ app.post('/api/sell', async (req, res) => {
 
     const securityId = secResult.recordset[0].id;
 
-    // Tjek beholdning
+    // Finder samlet beholdning af det valgte værdipapir i porteføljen
     const holdings = await pool.request()
       .input('portfolioId', sql.Int, portfolioId)
       .input('securityId', sql.Int, securityId)
@@ -187,7 +191,7 @@ app.post('/api/sell', async (req, res) => {
       return res.status(400).json({ success: false, message: "Not enough shares to sell" });
     }
 
-    //  Indsæt trade
+    // Indsætter salget som en 'SELL' i Trades-tabellen
     await pool.request()
       .input('portfolioId', sql.Int, portfolioId)
       .input('accountId', sql.Int, accountId)
@@ -201,7 +205,7 @@ app.post('/api/sell', async (req, res) => {
         VALUES (@portfolioId, @accountId, @securityId, @amount, @totalPrice, @fee, @type)
       `);
 
-    // Opdater balance
+    // Lægger salgsbeløbet til kontoen
     await pool.request()
       .input('amount', sql.Decimal(18, 2), totalPrice)
       .input('accountId', sql.Int, accountId)
@@ -237,12 +241,12 @@ app.use('/images', express.static(path.join(__dirname, '..', 'HTML', 'images')))
 
 // Hjemmeside rute (index.html)
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'HTML', 'frontpage.html'));
+  res.sendFile(path.join(__dirname, '..', 'HTML', 'frontpage.html'));
 });
 
 // Login rute
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, '../HTML', 'login.html')); 
+  res.sendFile(path.join(__dirname, '../HTML', 'login.html'));
 });
 
 // Opret bruger

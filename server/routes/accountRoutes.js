@@ -91,7 +91,7 @@ router.put('/addbalance', async (req, res) => {
     try {
         const pool = await getConnection();
 
-        // Stop hvis konto er lukket
+        // Tjekker om kontoen er lukket – hvis ja, må der ikke indsættes/hæves penge
         const check = await pool.request()
             .input('accountId', sql.Int, accountId)
             .query('SELECT is_closed FROM Accounts WHERE id = @accountId');
