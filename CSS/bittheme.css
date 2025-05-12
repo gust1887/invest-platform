@@ -1,5 +1,5 @@
 
-/* Background color */
+/* Baggrundsfarve */
 body {
   background-color: black;
   color: white;
@@ -8,7 +8,7 @@ body {
   padding-top: 50px;
 }
 
-/* To make sure our background fills the page */
+/* Fyld hele siden */
 html, body {
   height: 100%;
   margin: 0;
