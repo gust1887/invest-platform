@@ -1,9 +1,9 @@
-// Henter og viser værdipapirer i den valgte portefølje ved sideindlæsning
 document.addEventListener("DOMContentLoaded", async () => {
   // Henter det valgte portefølje-ID fra sessionStorage
   const portfolioId = sessionStorage.getItem("selectedPortfolioId");
-
   const name = sessionStorage.getItem("selectedPortfolioName");
+
+  // Overskrift → navn hvis valgt
   document.getElementById("portfolioHeading").innerText = name ? `Securities in ${name}` : "Securities Overview";
 
   if (!portfolioId) {
@@ -22,9 +22,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const chartData = [];
     let totalValue = 0;
 
-    // Hent valuta fra sessionStorage 
+    // Standardvaluta hvis ikke angivet
     const currency = sessionStorage.getItem("accountCurrency") || "USD";
-
 
     securities.forEach(security => {
       const cached = getCachedPrice(security.ticker);
@@ -36,30 +35,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       totalValue += total;
 
+      // Indsætter række i tabellen
       const row = document.createElement("tr");
       row.innerHTML = `
-                <td>${security.securitiesName}</td>
-                <td>${security.ticker}</td>
-                <td>${security.totalQuantity}</td>
-                <td>${currentPrice.toFixed(2)} ${currency}</td>
-                <td>${total.toFixed(2)} ${currency}</td>
-                <td>${change24h}</td>
-            `;
+        <td>${security.securitiesName}</td>
+        <td>${security.ticker}</td>
+        <td>${security.totalQuantity}</td>
+        <td>${currentPrice.toFixed(2)} ${currency}</td>
+        <td>${total.toFixed(2)} ${currency}</td>
+        <td>${change24h}</td>
+      `;
       tbody.appendChild(row);
 
       labels.push(security.ticker);
       chartData.push(total);
     });
 
-    // Opdaterer total portfølje værdi
+    // Vis samlet værdi og farve
     const totalVal = document.getElementById("totalValueDisplay");
     totalVal.innerText = `${totalValue.toFixed(2)} ${currency}`;
-    // Grøn farve for positiv værdi
     totalVal.style.color = totalValue > 0 ? "#4caf50" : "white";
 
+    
 
-
-    // Tegner donut-diagram over værdipapirernes værdi
+    // Tegn donut chart
     const ctx = document.getElementById("securitiesChart").getContext("2d");
     new Chart(ctx, {
       type: "doughnut",
@@ -87,7 +86,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// Knapper til buy/sell → åbner nye sider
+// Køb/solgt knapper → nye sider
 function handleBuy() {
   window.location.href = "buystocks.html";
 }
@@ -95,28 +94,27 @@ function handleSell() {
   window.location.href = "sellstocks.html";
 }
 
-// Returnerer cached pris for en aktie hvis data er under 24 timer gammelt
+
 function getCachedPrice(symbol) {
   const raw = localStorage.getItem(`stockData-${symbol}`);
   if (!raw) return null;
 
   const parsed = JSON.parse(raw);
-  const maxAge = 24 * 60 * 60 * 1000; // 24 timer
+  const maxAge = 24 * 60 * 60 * 1000;
 
   if (Date.now() - parsed.timestamp < maxAge) {
     const prices = parsed.data;
     return prices && prices.length > 0
-      ? prices[prices.length - 1].pris // sidste pris i listen
+      ? prices[prices.length - 1].pris
       : null;
   }
 
   return null;
 }
 
-// Kalder API og opdaterer alle aktiekurser i den valgte portefølje (fra API og gemmer i localStorage)
+// Henter aktiekurser igen og opdaterer localStorage
 async function opdaterAlleKurser() {
   const portfolioId = sessionStorage.getItem("selectedPortfolioId");
-
   if (!portfolioId) {
     alert("No portfolio selected");
     return;
@@ -129,8 +127,6 @@ async function opdaterAlleKurser() {
     for (const sec of securities) {
       const response = await fetch(`/api/${sec.ticker}`);
       const data = await response.json();
-
-      // Gemmer ny kursdata i localStorage
       saveToCache(sec.ticker, data);
     }
 
@@ -142,24 +138,21 @@ async function opdaterAlleKurser() {
   }
 }
 
-// Beregn 24 timers ændring baseret på localStorage data
+// Udregn 24 timers ændring i procent
 const get24hChange = symbol => {
   const raw = localStorage.getItem(`stockData-${symbol}`);
   if (!raw) return "0.00%";
 
   const parsed = JSON.parse(raw);
   const prices = parsed.data;
-
   if (!prices || prices.length < 2) return "0.00%";
 
   const current = prices[prices.length - 1].pris;
   const yesterday = prices[prices.length - 2]?.pris;
-
   if (!current || !yesterday || yesterday === 0) return "0.00%";
 
   const diff = current - yesterday;
   const pct = (diff / yesterday) * 100;
-  const formatted = `${pct > 0 ? '+' : ''}${pct.toFixed(2)}%`;
-  return formatted;
-}
+  return `${pct > 0 ? '+' : ''}${pct.toFixed(2)}%`;
+};
 

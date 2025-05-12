@@ -16,11 +16,11 @@ if (changePasswordForm) {
     // Elementet hvor feedback (fejl/succes) vises til brugeren
     const messageEl = document.getElementById('changeMessage');
 
-    // Validerer den nye adgangskode: 8-20 tegn og mindst ét tal
+    // Validerer den nye adgangskode: 8-20 tegn og mindst et tal
     const passwordIsValid = newPassword.length >= 8 &&
                             newPassword.length <= 20 &&
-                            /\d/.test(newPassword); // tjekker om der er mindst ét ciffer
-
+                            /\d/.test(newPassword); 
+    
     // Hvis adgangskoden ikke opfylder kravene, vises fejlbesked og funktionen afsluttes
     if (!passwordIsValid) {
       messageEl.textContent = 'Ny adgangskode skal være 8-20 tegn og indeholde mindst ét tal.';
